@@ -4,12 +4,13 @@
       "inheritEnvironments": [
         "mingw_64"
       ],
-      "name": "Mingw64",
+      "name": "Win32",
       "includePath": [
         "${env.INCLUDE}",
-        "${workspaceRoot}\\**"
+        "${workspaceRoot}\\**",
+        "C:/MinGW/include/*"
       ],
-      "intelliSenseMode": "linux-gcc-x64"
+      "intelliSenseMode": "gcc-x86"
     }
   ]
 }
