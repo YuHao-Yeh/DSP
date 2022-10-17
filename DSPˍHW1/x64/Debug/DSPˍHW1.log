@@ -1,0 +1,2 @@
+﻿  test_hmm.c
+C:\Users\user\OneDrive - 國立台灣大學\NTU\111-1\DSP\dsp_hw1\src\test_hmm.c(1,10): fatal error C1083: 無法開啟包含檔案: 'hmm.h': No such file or directory
