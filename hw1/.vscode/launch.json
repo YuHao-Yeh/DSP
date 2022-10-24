@@ -1,0 +1,60 @@
+// {
+//    "version": "0.2.0",
+//    "configurations": [
+//    {
+//       "name": "(gdb) Launch",                // 使用 GDB 除錯程式
+//       "type": "cppdbg",
+//       "request": "launch",
+//       "targetArchitecture": "x86",
+//       "program": "${workspaceFolder}/build/${workspaceFolderBasename}.exe",   // 之前編譯好的可執行檔案路徑
+//       "args": [],
+//       "stopAtEntry": false,
+//       "cwd": "${workspaceFolder}/build",     // 設定 cwd 到 build 目錄
+//       "environment": [],
+//       "externalConsole": true,               // 不要在整合終端裡執行程式
+//       "MIMode": "gdb",
+//       "miDebuggerPath": "C:/MinGW/bin/gdb.exe",                               // 偵錯程式可執行檔案的路徑
+//       "preLaunchTask": "complie",
+//       "setupCommands": [
+//          {
+//             "description": "啟用 gdb 的美化顯示",
+//             "text": "-enable-pretty-printing",
+//             "ignoreFailures": true
+//          },
+//          {
+//             "description":  "將反組譯碼變體設為 Intel",
+//             "text": "-gdb-set disassembly-flavor intel",
+//             "ignoreFailures": true
+//          }
+//       ],
+//    }
+//    ]
+// }
+
+{
+   "version": "0.2.0",
+   "configurations": [
+      {
+         "name": "(gdb) Launch",                // 使用 GDB 除錯程式
+         "type": "cppdbg",
+         "request": "launch",
+         "targetArchitecture": "x86",
+         "program": "${workspaceFolder}/build/${workspaceFolderBasename}.exe",   // 之前編譯好的可執行檔案路徑
+         "args": [],
+         "stopAtEntry": false,
+         "cwd": "${workspaceFolder}/build",     // 設定 cwd 到 build 目錄
+         "environment": [],
+         "externalConsole": true,               // 不要在整合終端裡執行程式
+         "MIMode": "gdb",
+         "miDebuggerPath": "C:/MinGW/bin/gdb.exe",                               // 偵錯程式可執行檔案的路徑
+         "preLaunchTask": "complie",
+         "setupCommands": [
+            {
+               "description": "啟用 gdb 的美化顯示",
+               "text": "-enable-pretty-printing",
+               "ignoreFailures": true
+            }
+         ],
+      }
+   ]
+}

@@ -1,0 +1,27 @@
+{
+   "configurations": [
+      {
+         "name": "Win32",                       // 配置的名稱，可以新增多個在編輯器右下角切換
+         "intelliSenseMode": "gcc-x86",
+
+         //-------------------------------------------------------------
+         // 這裡的編譯器路徑，包括下面的一些選項都只是
+         // 給 IntelliSense 用的，和具體專案構建沒關係
+         //-------------------------------------------------------------
+         "compilerPath": "C:/MinGW/bin/gcc.exe", //把這裡的C:/MinGW/bin換成自己的安裝路徑
+         
+         "includePath": [
+            "${workspaceFolder}/**",
+            "C:/MinGW/include/*"                // 把這裡的C:/MinGW/include/換成自己的include路徑
+         ],
+         "defines": [
+            "_DEBUG",
+            "UNICODE",
+            "_UNICODE"
+         ],
+         "cStandard": "c11",
+         "cppStandard": "c++17"
+      }
+   ],
+   "version": 4
+}
