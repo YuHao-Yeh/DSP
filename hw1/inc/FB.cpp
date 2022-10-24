@@ -1,3 +1,9 @@
+//----------------------------------------------------------------------
+// File:       FB.cpp
+// Author:     Yu-Hao Yeh
+// Synopsis:   Realization of Forward-Backward Algorithm
+// Date:       2022/10/25
+//----------------------------------------------------------------------
 #include "FB.h"
 
 void FBAlg::GetSeq(string filepath)
@@ -23,37 +29,25 @@ void FBAlg::GetSeq(string filepath)
 
 void FBAlg::CalVar()
 {
-   // puts("AL");
    CalAlph();
-   // puts("BE");
    CalBeta();
-   // puts("GA");
    CalGamma();
-   // puts("XI");
    CalXi();
 }
 
 void FBAlg::CalAlph()
 {
    // Base case : aplh_1(i) = pi_i * beta_i(obsevation_1)
-   // puts("A0");
    for (int l = 0; l < dLINE; l++)
       for (int j = 0; j < state; j++)
          fb.a.at(l)[0][j] = hmm.initial[j] * hmm.observation[fb.seq.at(l)[0]][j];
-   // cout << "a[0][0][0] should be " << hmm.initial[0] * hmm.observation[fb.seq->at(0)[0]][0] << endl;
-   // for (int l = 0; l < 5; l++)
-   // {
-   //    for (int j = 0; j < state; j++)
-   //       cout << fb.a.at(l)[0][j] << " ";
-   //    puts("");
-   // }
+
    //----------------------------------------------------------------
    // Inductive step:
    // alph_{t+1}(i) = sigma_{i=1}^N {alph_t(i) * tran_a_ij} * ob_b_j(o_{t+1})
    // 1 <= t <= T-1
    // 1 <= j <= N
    //----------------------------------------------------------------
-   // puts("A1");
    for (int l = 0; l < dLINE; l++)
       for (int t = 1; t < dTIME; t++)
       {
@@ -68,13 +62,11 @@ void FBAlg::CalAlph()
          }
          free(tmp);
       }
-   // puts("A2");
 }
 
 void FBAlg::CalBeta()
 {
    // Base case : beta_T(i) = 1
-   // puts("B1");
    for (int l = 0; l < dLINE; l++)
       for (int i = 0; i < state; i++)
          fb.b.at(l)[dTIME - 1][i] = 1.0;
@@ -85,20 +77,15 @@ void FBAlg::CalBeta()
    // t = T-1, T-2, ..., 1
    // 1 <= i <= N
    //----------------------------------------------------------------
-   // puts("B2");
-
    for (int l = 0; l < dLINE; l++)
       for (int t = dTIME - 2; t >= 0; t--)
          for (int i = 0; i < state; i++)
             for (int j = 0; j < state; j++)
                fb.b.at(l)[t][i] += hmm.transition[i][j] * hmm.observation[fb.seq.at(l)[t + 1]][j] * fb.b.at(l)[t + 1][j];
-
-   // puts("B3");
 }
 
 void FBAlg::CalGamma()
 {
-   // puts("G1");
    for (int l = 0; l < dLINE; l++)
       for (int t = 0; t < dTIME; t++)
       {
@@ -115,20 +102,15 @@ void FBAlg::CalGamma()
          for (int i = 0; i < state; i++)
             fb.g.at(l)[t][i] = tmp[i] / sum;
       }
-   // puts("G2");
 }
 
 void FBAlg::CalXi()
 {
-   // puts("X1");
    for (int l = 0; l < dLINE; l++)
-   {
-      // puts("X2");
       for (int t = 0; t < dTIME - 1; t++)
       {
          double sum = 0, tmp;
 
-         // puts("X3");
          for (int j = 0; j < state; j++)
          {
             for (int i = 0; i < state; i++)
@@ -141,7 +123,6 @@ void FBAlg::CalXi()
             }
          }
 
-         // puts("X4");
          for (int i = 0; i < state; i++)
             for (int j = 0; j < state; j++)
             {
@@ -152,32 +133,14 @@ void FBAlg::CalXi()
                fb.x.at(l)[t][i][j] = tmp / sum;
             }
       }
-   }
-   // puts("X5");
 }
 
 void FBAlg::Update()
 {
-   // puts("Update1");
-   for (int i = 0; i < state; i++)
-      fb.newI.at(i) = 0.0;
-   // puts("Update2");
-   for (int i = 0; i < state; i++)
-      for (int j = 0; j < state; j++)
-         fb.newT.at(i)[j] = 0.0;
-   // puts("Update3");
-   for (int i = 0; i < obnum; i++)
-      for (int j = 0; j < state; j++)
-         fb.newT.at(i)[j] = 0.0;
-   // puts("Update4");
    UpdateInitial();
-   // puts("Update5");
    UpdateTransitionA();
-   // puts("Update6");
    UpdateObservationB();
    UpdateHMM();
-   // PrintHMM();
-   Print();
 }
 
 void FBAlg::UpdateInitial()
@@ -190,11 +153,20 @@ void FBAlg::UpdateInitial()
          sum += fb.g.at(l)[0][i];
       fb.newI.at(i) = sum / dLINE;
    }
+
+   // Check Initial Matrix : Sum of each probability should equal to 1
+   sum = 0.0;
+   for (int i = 0; i < state; i++)
+      sum += fb.newI.at(i);
+   if (sum != 1.0)
+      for (int i = 0; i < state; i++)
+         fb.newI.at(i) /= sum;
+   // fb.newI.at(i) = round(dDIGIT * (fb.newI.at(i) / sum)) / dDIGIT;
 }
 
 void FBAlg::UpdateTransitionA()
 {
-   double sum_g, sum_x;
+   double sum, sum_g, sum_x;
 
    for (int i = 0; i < state; i++)
       for (int j = 0; j < state; j++)
@@ -211,6 +183,17 @@ void FBAlg::UpdateTransitionA()
 
          fb.newT.at(i)[j] = sum_x / sum_g;
       }
+   // Check Trasition Matrix : Sum of each row should equal to 1
+   for (int i = 0; i < state; i++)
+   {
+      sum = 0.0;
+      for (int j = 0; j < state; j++)
+         sum += fb.newT.at(i)[j];
+      if (sum != 1.0)
+         for (int j = 0; j < state; j++)
+            fb.newT.at(i)[j] /= sum;
+      // fb.newT.at(i)[j] = round(dDIGIT * (fb.newT.at(i)[j] / sum)) / dDIGIT;
+   }
 }
 
 void FBAlg::UpdateObservationB()
@@ -233,73 +216,45 @@ void FBAlg::UpdateObservationB()
          fb.newO.at(k)[j] = sum_o / sum;
       }
    }
+   // Check Observation Matrix : Sum of each column should equal to 1
+   for (int j = 0; j < obnum; j++)
+   {
+      sum = 0.0;
+      for (int i = 0; i < state; i++)
+         sum += fb.newT.at(i)[j];
+      if (sum != 1.0)
+         for (int i = 0; i < state; i++)
+            fb.newO.at(i)[j] /= sum;
+      // fb.newO.at(i)[j] = round(dDIGIT * (fb.newO.at(i)[j] / sum)) / dDIGIT;
+   }
 }
 
 void FBAlg::UpdateHMM()
 {
-   int digit = 100000;
    for (int i = 0; i < state; i++)
-      hmm.initial[i] = round(digit * fb.newI.at(i)) / digit;
+      hmm.initial[i] = fb.newI.at(i);
    for (int i = 0; i < state; i++)
       for (int j = 0; j < state; j++)
-         hmm.transition[i][j] = round(digit * fb.newT.at(i)[j]) / digit;
+         hmm.transition[i][j] = fb.newT.at(i)[j];
    for (int i = 0; i < obnum; i++)
       for (int j = 0; j < state; j++)
-         hmm.observation[i][j] = round(digit * fb.newO.at(i)[j]) / digit;
-}
-
-void FBAlg::Print()
-{
-   // for (int i = 0; i < dTIME; i++)
-   //    cout << fb.seq->at(0)[i] << " ";
-   // puts("");
-
-   // puts(".....................");
-
-   // for (int i = 0; i < state; i++)
-   // {
-   //    for (int j = 0; j < dTIME; j++)
-   //       cout << fb.a.at(0)[j][i] << " ";
-   //    puts("");
-   // }
-
-   // puts("--------------------");
-
-   // for (int i = 0; i < 5; i++)
-   // {
-   //    for (int j = 0; j < dTIME; j++)
-   //       cout << fb.b.at(i)[j][0] << " ";
-   //    puts("");
-   // }
-
-   // puts(".....................");
-
-   // for (int i = 0; i < 5; i++)
-   // {
-   //    for (int j = 0; j < dTIME; j++)
-   //       cout << fb.g.at(i)[j][0] << " ";
-   //    puts("");
-   // }
-
-   // puts(".....................");
-   double sum = 0.0;
-   for (int i = 0; i < state; i++)
-      sum += fb.a.at(dLINE - 1)[dTIME - 1][i];
-   cout << "P(O | lambda) = " << sum << endl;
+         hmm.observation[i][j] = fb.newO.at(i)[j];
 }
 
 void FBAlg::PrintHMM()
 {
-   cout << "filename: " << hmm.model_name << endl;
+   cout << "Initial filename: " << hmm.model_name << endl
+        << endl;
    cout << "initial: " << hmm.state_num << endl;
    for (int i = 0; i < hmm.state_num; i++)
-      cout << hmm.initial[i] << " ";
+      cout << setw(11) << hmm.initial[i] << " ";
+   puts("");
    puts("");
    cout << "transition: " << hmm.state_num << endl;
    for (int i = 0; i < hmm.state_num; i++)
    {
       for (int j = 0; j < hmm.state_num; j++)
-         cout << hmm.transition[i][j] << " ";
+         cout << setw(11) << hmm.transition[i][j] << " ";
       puts("");
    }
    puts("");
@@ -307,16 +262,28 @@ void FBAlg::PrintHMM()
    for (int i = 0; i < hmm.observ_num; i++)
    {
       for (int j = 0; j < hmm.state_num; j++)
-         cout << hmm.observation[i][j] << " ";
+         cout << setw(11) << hmm.observation[i][j] << " ";
       puts("");
    }
-   puts("");
    puts("----------------------------");
 }
 
 void FBAlg::WriteHMM(string filepath)
 {
+   puts("----------------------------");
    cout << "Output filepath: " << filepath << endl;
+
+   for (int i = 0; i < state; i++)
+      fb.newI.at(i) = round(dDIGIT * fb.newI.at(i)) / dDIGIT;
+
+   for (int i = 0; i < state; i++)
+      for (int j = 0; j < state; j++)
+         fb.newT.at(i)[j] = round(dDIGIT * fb.newT.at(i)[j]) / dDIGIT;
+
+   for (int j = 0; j < obnum; j++)
+      for (int i = 0; i < state; i++)
+         fb.newO.at(i)[j] = round(dDIGIT * fb.newO.at(i)[j]) / dDIGIT;
+
    FILE *fp;
    fp = fopen(filepath.c_str(), "w");
    if (open_or_die(filepath.c_str(), "w"))

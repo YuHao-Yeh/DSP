@@ -1,3 +1,9 @@
+//----------------------------------------------------------------------
+// File:       test.cpp
+// Author:     Yu-Hao Yeh
+// Synopsis:   HMM finding most possible path via Viterbi Algorithm
+// Date:       2022/10/25
+//----------------------------------------------------------------------
 #include "bits/stdc++.h"
 #include "../inc/hmm.h"
 #include "../inc/Viterbi.h"
@@ -23,37 +29,29 @@ int main(int argc, char *argv[])
    //-------------------------------------------------------------------
    // Read Input File
    //-------------------------------------------------------------------
-   string flist = argv[1];
-   string fseq = argv[2];
-   string fout = argv[3];
+   string flist = argv[1]; // model list filepath
+   string fseq = argv[2];  // test sequence filepath
+   string fout = argv[3];  // output filepath
 
    //-------------------------------------------------------------------
    // Start Viterbi Algorithm
    //-------------------------------------------------------------------
    HMM hmm[5];
-   // puts("A");
    load_models(flist.c_str(), hmm, dMAX_NUM);
-   // puts("B");
    Viterbi vit(hmm, dMAX_NUM);
-   // puts("C");
    vit.GetSeq(fseq);
-   // puts("D");
    vit.Process();
 
    //-------------------------------------------------------------------
    // Write File
    //-------------------------------------------------------------------
-   // puts("E");
    vit.WriteViterbi(fout);
 
-   // puts("F");
-   vit.PrintAccuracy();
+   dump_models(hmm, 5);
 
-   // puts("G");
    tmusg.getPeriodUsage(stat);
    cout << "The total CPU time: " << (stat.uTime + stat.sTime) / 1000.0 / 1000.0 << "s" << endl;
    cout << "memory: " << stat.vmPeak / 1024.0 << "MB" << endl; // print peak memory
 
-   // puts("H");
    return 0;
 }

@@ -1,3 +1,9 @@
+//----------------------------------------------------------------------
+// File:       Viterbi.cpp
+// Author:     Yu-Hao Yeh
+// Synopsis:   Realization of Viterbi Algorithm (Baum-Welch Algorithm)
+// Date:       2022/10/25
+//----------------------------------------------------------------------
 #include "Viterbi.h"
 
 void Viterbi::GetSeq(string filepath)
@@ -23,13 +29,9 @@ void Viterbi::GetSeq(string filepath)
 void Viterbi::Process()
 {
    for (int i = 0; i < modnum; i++)
-   {
-      // cout << "Process " << i << endl;
       CalDelta(i);
-   }
-   // puts("Finish process");
+
    FindMax();
-   // puts("Max finded");
 }
 
 void Viterbi::CalDelta(int mod)
@@ -47,7 +49,7 @@ void Viterbi::CalDelta(int mod)
          {
             vector<double> tmp(dTIME, 0.0);
             for (int i = 0; i < state; i++)
-               tmp.at(i) = vit[mod].d.at(l)[t - 1][i];
+               tmp.at(i) = vit[mod].d.at(l)[t - 1][i] * hmm[mod].transition[i][j];
 
             double max = *max_element(tmp.begin(), tmp.end());
             int index = max_element(tmp.begin(), tmp.end()) - tmp.begin();
@@ -62,67 +64,48 @@ void Viterbi::FindMax()
    vector<double> tmp(modnum, 0.0);
    for (int l = 0; l < dLINE; l++)
    {
-      // cout << "current : " << l << endl;
-      // puts("F1");
       for (int i = 0; i < modnum; i++)
          tmp.at(i) = vit[i].d.at(l)[dTIME - 1][seq.at(l)[dTIME - 1]];
-      // puts("F2");
       max[l].second = *max_element(tmp.begin(), tmp.end());
-      // puts("F3");
-      max[l].first = max_element(tmp.begin(), tmp.end()) - tmp.begin();
-      // tmp.clear();
+      max[l].first = max_element(tmp.begin(), tmp.end()) - tmp.begin() + 1;
    }
 }
 
-void Viterbi::PrintHMM(int h)
+void Viterbi::WriteAccuracy()
 {
-   cout << "filename: " << hmm[h].model_name << endl;
-   cout << "initial: " << hmm[h].state_num << endl;
-   for (int i = 0; i < hmm[h].state_num; i++)
-      cout << hmm[h].initial[i] << " ";
-   puts("");
-
-   cout << "transition: " << hmm[h].state_num << endl;
-   for (int i = 0; i < hmm[h].state_num; i++)
-   {
-      for (int j = 0; j < hmm[h].state_num; j++)
-         cout << hmm[h].transition[i][j] << " ";
-      puts("");
-   }
-   puts("");
-
-   cout << "observation: " << hmm[h].state_num << endl;
-   for (int i = 0; i < hmm[h].observ_num; i++)
-   {
-      for (int j = 0; j < hmm[h].state_num; j++)
-         cout << hmm[h].observation[i][j] << " ";
-      puts("");
-   }
-   puts("");
-   puts("----------------------------");
-}
-
-void Viterbi::PrintAccuracy()
-{
-   string file = "./data/test_lbl.txt";
-   ifstream ifs(file, ios::in);
+   string fin = "./data/test_lbl.txt";
+   string fout = "./data/test_accuracy.txt";
+   ifstream ifs(fin, ios::in);
    if (!ifs.is_open())
    {
-      perror(file.c_str());
+      perror(fin.c_str());
       exit(1);
    }
+   ofstream ofs(fout, ios::out);
+   if (!ofs.is_open())
+   {
+      perror(fout.c_str());
+      exit(1);
+   }
+
    vector<int> ans(dLINE, 0);
-   char tmp[20];
+   char tmp[13];
    int i = 0;
-   while (ifs.getline(tmp, 20))
+   while (ifs.getline(tmp, 13))
    {
       ans.at(i) = int(tmp[7] - '0');
+      i++;
    }
    int count = 0;
-   for (i = 0; i < dLINE; i++)
-      if (ans.at(i) == max.at(i).first)
+   for (int l = 0; l < dLINE; l++)
+      if (ans.at(l) == this->max.at(l).first)
          count++;
-   cout << "Accuracy = " << 1.0 * count / dLINE * 100.0 << "%.\n";
+
+   ofs << count << " cases are corrected.\n";
+   ofs << "Accuracy = " << 1.0 * count / dLINE * 100.0 << "%.\n";
+
+   ifs.close();
+   ofs.close();
 }
 
 void Viterbi::WriteViterbi(string filepath)

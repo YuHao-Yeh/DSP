@@ -1,3 +1,9 @@
+//----------------------------------------------------------------------
+// File:       train.cpp
+// Author:     Yu-Hao Yeh
+// Synopsis:   HMM training via Forward-Backward Algorithm
+// Date:       2022/10/25
+//----------------------------------------------------------------------
 #include "bits/stdc++.h"
 #include "../inc/hmm.h"
 #include "../inc/FB.h"
@@ -19,8 +25,6 @@ int main(int argc, char *argv[])
    }
    CommonNs::TmUsage tmusg;
    CommonNs::TmStat stat;
-   CommonNs::TmUsage tmusg2;
-   CommonNs::TmStat stat2;
 
    //-------------------------------------------------------------------
    // Read Input File
@@ -39,30 +43,23 @@ int main(int argc, char *argv[])
    //-------------------------------------------------------------------
    short iter = 0;
    tmusg.periodStart();
-   tmusg2.periodStart();
 
    while (iter < iteration)
    {
-      // ofstream ofs;
       forbackward.CalVar();
       forbackward.Update();
-      cout << "iter " << iter << " : ";
-
-      tmusg2.getPeriodUsage(stat2);
-      cout << (stat2.uTime + stat2.sTime) / 1000.0 / 1000.0 << "s" << endl;
-      if (!((iter + 1) % 10))
-      {
-         cout << "Iteration: " << iter + 1 << " complete.\n";
-         tmusg.getPeriodUsage(stat);
-         cout << "The total CPU time: " << (stat.uTime + stat.sTime) / 1000.0 / 1000.0 << "s" << endl;
-         cout << "memory: " << stat.vmPeak / 1024.0 << "MB" << endl; // print peak memory
-         puts("---------------------------------");
-      }
 
       iter++;
+      if (!(iter % 20))
+         cout << iter << " iterations are done.\n";
    }
 
    forbackward.WriteHMM(fout);
+
+   tmusg.getPeriodUsage(stat);
+   cout << "The total CPU time: " << (stat.uTime + stat.sTime) / 1000.0 / 1000.0 << "s" << endl;
+   cout << "memory: " << stat.vmPeak / 1024.0 << "MB" << endl; // print peak memory
+   puts("----------------------------");
 
    return 0;
 }

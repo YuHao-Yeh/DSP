@@ -1,9 +1,8 @@
 //----------------------------------------------------------------------
 // File:       FB.h
 // Author:     Yu-Hao Yeh
-// Synopsis:   Forward-Backward Algorithm (Baum-Welch Algorithm)
-// Date:       2022/10/22
-// Resource:
+// Synopsis:   Realization of Forward-Backward Algorithm (Baum-Welch Algorithm)
+// Date:       2022/10/25
 //----------------------------------------------------------------------
 #ifndef _FB_H_
 #define _FB_H_
@@ -17,6 +16,10 @@
 
 #ifndef defTIME
 #define dTIME 50
+#endif
+
+#ifndef defDIGIT
+#define dDIGIT 100000
 #endif
 
 using namespace std;
@@ -50,6 +53,7 @@ private:
    void CalBeta();
    void CalGamma();
    void CalXi();
+
    // Update data set; called by Update()
    void UpdateInitial();
    void UpdateTransitionA();
@@ -59,25 +63,17 @@ private:
 public:
    FBAlg(HMM hmm_a, int iter) //: hmm(hmm), iteration(iteration)
    {
-      // puts("0");
       state = hmm_a.state_num;
-      // puts("1");
       obnum = hmm_a.observ_num;
-      // puts("2");
       hmm = hmm_a;
-      // puts("3");
       iteration = iter;
-      // puts("4");
       fb.a.assign(dLINE, vector<vector<double>>(dTIME, vector<double>(state, 0.0)));
       fb.b.assign(dLINE, vector<vector<double>>(dTIME, vector<double>(state, 0.0)));
       fb.g.assign(dLINE, vector<vector<double>>(dTIME, vector<double>(state, 0.0)));
       fb.x.assign(dLINE, vector<vector<vector<double>>>(dTIME, vector<vector<double>>(state, vector<double>(state, 0.0))));
       fb.seq.assign(dLINE, vector<int>(dTIME, 0));
-      // puts("5");
       fb.newI.assign(state, 0.0);
-      // puts("6");
       fb.newT.assign(state, vector<double>(state, 0.0));
-      // puts("7");
       fb.newO.assign(obnum, vector<double>(state, 0.0));
    }
    ~FBAlg(){};
@@ -92,7 +88,6 @@ public:
    void Update();
 
    // Print
-   void Print();
    void PrintHMM();
 
    // Write File
