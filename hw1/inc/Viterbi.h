@@ -37,7 +37,7 @@ private:
    short obnum;
    int modnum;
    vector<vector<int>> seq;
-   vector<pair<int, double>> max; // // result probabilit and path (model, probability)
+   vector<pair<int, double>> max; // // result probability and path (model, probability)
    HMM hmm[dMAX_NUM];
    Vit vit[dMAX_NUM];
 

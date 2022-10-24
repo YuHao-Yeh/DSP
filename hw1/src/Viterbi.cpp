@@ -4,7 +4,7 @@
 // Synopsis:   Realization of Viterbi Algorithm (Baum-Welch Algorithm)
 // Date:       2022/10/25
 //----------------------------------------------------------------------
-#include "Viterbi.h"
+#include "../inc/Viterbi.h"
 
 void Viterbi::GetSeq(string filepath)
 {

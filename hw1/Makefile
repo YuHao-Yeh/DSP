@@ -20,11 +20,11 @@ TARGET: train test
 all: $(TARGET)
 	@echo -n ""
 
-train: src/train.o inc/FB.o inc/tm_usage.o
+train: src/train.o src/FB.o src/tm_usage.o
 	$(CXX) $(CFLAGS) $(INC) $(OPTFLAGS) $^ -o train
 	@echo "FINISH train"
 
-test: src/test.o inc/Viterbi.o inc/tm_usage.o
+test: src/test.o src/Viterbi.o src/tm_usage.o
 	$(CXX) $(CFLAGS) $(INC) $(OPTFLAGS) $^ -o test
 	@echo "FINISH test"
 

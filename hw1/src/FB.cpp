@@ -4,7 +4,7 @@
 // Synopsis:   Realization of Forward-Backward Algorithm
 // Date:       2022/10/25
 //----------------------------------------------------------------------
-#include "FB.h"
+#include "../inc/FB.h"
 
 void FBAlg::GetSeq(string filepath)
 {
