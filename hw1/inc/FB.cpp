@@ -14,7 +14,7 @@ void FBAlg::GetSeq(string filepath)
    while (ifs.getline((char *)&tmp, dTIME + 1))
    {
       for (int j = 0; j < dTIME; j++)
-         fb.seq->at(i)[j] = int(tmp[j] - 'A');
+         fb.seq.at(i)[j] = int(tmp[j] - 'A');
       i++;
    }
 
@@ -39,7 +39,7 @@ void FBAlg::CalAlph()
    // puts("A0");
    for (int l = 0; l < dLINE; l++)
       for (int j = 0; j < state; j++)
-         fb.a.at(l)[0][j] = hmm.initial[j] * hmm.observation[fb.seq->at(l)[0]][j];
+         fb.a.at(l)[0][j] = hmm.initial[j] * hmm.observation[fb.seq.at(l)[0]][j];
    // cout << "a[0][0][0] should be " << hmm.initial[0] * hmm.observation[fb.seq->at(0)[0]][0] << endl;
    // for (int l = 0; l < 5; l++)
    // {
@@ -64,7 +64,7 @@ void FBAlg::CalAlph()
          {
             for (int i = 0; i < state; i++)
                tmp[j] += fb.a.at(l)[t - 1][i] * hmm.transition[i][j];
-            fb.a.at(l)[t][j] = tmp[j] * hmm.observation[fb.seq->at(l)[t]][j];
+            fb.a.at(l)[t][j] = tmp[j] * hmm.observation[fb.seq.at(l)[t]][j];
          }
          free(tmp);
       }
@@ -91,7 +91,7 @@ void FBAlg::CalBeta()
       for (int t = dTIME - 2; t >= 0; t--)
          for (int i = 0; i < state; i++)
             for (int j = 0; j < state; j++)
-               fb.b.at(l)[t][i] += hmm.transition[i][j] * hmm.observation[fb.seq->at(l)[t + 1]][j] * fb.b.at(l)[t + 1][j];
+               fb.b.at(l)[t][i] += hmm.transition[i][j] * hmm.observation[fb.seq.at(l)[t + 1]][j] * fb.b.at(l)[t + 1][j];
 
    // puts("B3");
 }
@@ -135,7 +135,7 @@ void FBAlg::CalXi()
             {
                tmp = fb.a.at(l)[t][i];
                tmp *= hmm.transition[i][j];
-               tmp *= hmm.observation[fb.seq->at(l)[t + 1]][j];
+               tmp *= hmm.observation[fb.seq.at(l)[t + 1]][j];
                tmp *= fb.b.at(l)[t + 1][j];
                sum += tmp;
             }
@@ -147,7 +147,7 @@ void FBAlg::CalXi()
             {
                tmp = fb.a.at(l)[t][i];
                tmp *= hmm.transition[i][j];
-               tmp *= hmm.observation[fb.seq->at(l)[t + 1]][j];
+               tmp *= hmm.observation[fb.seq.at(l)[t + 1]][j];
                tmp *= fb.b.at(l)[t + 1][j];
                fb.x.at(l)[t][i][j] = tmp / sum;
             }
@@ -177,6 +177,7 @@ void FBAlg::Update()
    UpdateObservationB();
    UpdateHMM();
    // PrintHMM();
+   Print();
 }
 
 void FBAlg::UpdateInitial()
@@ -225,7 +226,7 @@ void FBAlg::UpdateObservationB()
          for (int l = 0; l < dLINE; l++)
             for (int t = 0; t < dTIME; t++)
             {
-               if (k == fb.seq->at(l)[t])
+               if (k == fb.seq.at(l)[t])
                   sum_o += fb.g[l][t][j];
                sum += fb.g[l][t][j];
             }
@@ -245,19 +246,6 @@ void FBAlg::UpdateHMM()
    for (int i = 0; i < obnum; i++)
       for (int j = 0; j < state; j++)
          hmm.observation[i][j] = round(digit * fb.newO.at(i)[j]) / digit;
-}
-
-vector<double> FBAlg::GetNewI()
-{
-   return fb.newI;
-}
-vector<vector<double>> FBAlg::GetNewT()
-{
-   return fb.newT;
-}
-vector<vector<double>> FBAlg::GetNewO()
-{
-   return fb.newO;
 }
 
 void FBAlg::Print()
@@ -294,6 +282,10 @@ void FBAlg::Print()
    // }
 
    // puts(".....................");
+   double sum = 0.0;
+   for (int i = 0; i < state; i++)
+      sum += fb.a.at(dLINE - 1)[dTIME - 1][i];
+   cout << "P(O | lambda) = " << sum << endl;
 }
 
 void FBAlg::PrintHMM()

@@ -2,6 +2,7 @@
 
 CXX = g++
 CFLAGS = -O2 -Wall -std=c++11 -Wno-psabi
+OPTFLAGS = -g
 LDFLAGS = -lm
 DBGFLAGS = -g -D_DEBUG_ON_
 TRAIN_ITER = 100
@@ -14,18 +15,23 @@ INC = -I$(INC_DIR)
 SRC = $(wildcard $(SRC_DIR)*.cpp)
 OBJ = $(SRC: %.cpp = %.o)
 
-TARGET: train #test
+TARGET: train test
 
 all: $(TARGET)
 	@echo -n ""
-train: src/train.o src/FB.o
-	$(CXX) src/train.o src/FB.o $(CFLAGS) $(INC) -o $@
-%.o : %.cpp inc/hmm.h
-	${CXX} $< ${CFLAGS} $(INC) -lpthread -c
-# src/train.o : src/train.cpp inc/hmm.h
-# 	$(CXX) src/train.cpp $(CFLAGS) $(INC) -c
-# src/FB.o : src/FB.h src/FB.cpp inc/hmm.h
-# 	$(CXX) src/FB.cpp $(CFLAGS) $(INC) -c
+
+train: src/train.o inc/FB.o inc/tm_usage.o
+	$(CXX) $(CFLAGS) $(INC) $(OPTFLAGS) $^ -o train
+	@echo "FINISH train"
+
+test: src/test.o inc/Viterbi.o inc/tm_usage.o
+	$(CXX) $(CFLAGS) $(INC) $(OPTFLAGS) $^ -o test
+	@echo "FINISH test"
+
+%.o : %.cpp
+	@echo ">> compiling: $<"
+	$(CXX) $(CFLAGS) $(INC) -lpthread -c $< -o $@
 
 clean:
-	@rm -rf *.o src/*.o
+	rm -f $(OBJ)
+	rm -rf *.o src/*.o inc/*.o src/*.o
