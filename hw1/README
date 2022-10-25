@@ -25,7 +25,7 @@ Makefile
 README
 
 ========================
-HOW TO CIMPILE:
+HOW TO COMPILE:
 
 To compile the demo, simply follow the following steps
 	make
@@ -53,8 +53,8 @@ OTHER NOTICE:
       +- inc/
       |  +- hmm.h, FB.h, Viterbi.h
       +- src/
-      |  +- train.cpp, FB.cpp      : train model by forward-backward algorithm.
+      |  +- train.cpp, FB.cpp       : train model by forward-backward algorithm.
       |  +- test.cpp, Viterbi.cpp   : test model by Viterbi algorithm
-      +- model_init.txt                     : initial training model
+      +- model_init.txt             : initial training model
       +- report.pdf
       +- Makefile
