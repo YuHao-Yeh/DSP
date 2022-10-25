@@ -41,7 +41,7 @@ typedef struct ForwardBackward
 class FBAlg
 {
 private:
-   int iteration;
+   int line;
    int state;
    int obnum; // observation number
    FB fb;
@@ -61,12 +61,12 @@ private:
    void UpdateHMM();
 
 public:
-   FBAlg(HMM hmm_a, int iter) //: hmm(hmm), iteration(iteration)
+   FBAlg(HMM hmm_a) : hmm(hmm_a)
    {
+      line = 0;
       state = hmm_a.state_num;
       obnum = hmm_a.observ_num;
-      hmm = hmm_a;
-      iteration = iter;
+
       fb.a.assign(dLINE, vector<vector<double>>(dTIME, vector<double>(state, 0.0)));
       fb.b.assign(dLINE, vector<vector<double>>(dTIME, vector<double>(state, 0.0)));
       fb.g.assign(dLINE, vector<vector<double>>(dTIME, vector<double>(state, 0.0)));

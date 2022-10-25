@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
    HMM hmm;
    loadHMM(&hmm, model_init.c_str());
-   FBAlg forbackward(hmm, iteration);
+   FBAlg forbackward(hmm);
    forbackward.GetSeq(fseq);
    //-------------------------------------------------------------------
    // Main Part

@@ -15,13 +15,13 @@ void FBAlg::GetSeq(string filepath)
       exit(1);
    }
 
-   int i = 0;
+   line = 0;
    char tmp[dTIME + 1];
    while (ifs.getline((char *)&tmp, dTIME + 1))
    {
       for (int j = 0; j < dTIME; j++)
-         fb.seq.at(i)[j] = int(tmp[j] - 'A');
-      i++;
+         fb.seq.at(line)[j] = int(tmp[j] - 'A');
+      line++;
    }
 
    ifs.close();
@@ -38,7 +38,7 @@ void FBAlg::CalVar()
 void FBAlg::CalAlph()
 {
    // Base case : aplh_1(i) = pi_i * beta_i(obsevation_1)
-   for (int l = 0; l < dLINE; l++)
+   for (int l = 0; l < line; l++)
       for (int j = 0; j < state; j++)
          fb.a.at(l)[0][j] = hmm.initial[j] * hmm.observation[fb.seq.at(l)[0]][j];
 
@@ -48,10 +48,11 @@ void FBAlg::CalAlph()
    // 1 <= t <= T-1
    // 1 <= j <= N
    //----------------------------------------------------------------
-   for (int l = 0; l < dLINE; l++)
+   double *tmp;
+   for (int l = 0; l < line; l++)
       for (int t = 1; t < dTIME; t++)
       {
-         double *tmp;
+
          tmp = (double *)calloc(state, sizeof(double));
 
          for (int j = 0; j < state; j++)
@@ -67,7 +68,7 @@ void FBAlg::CalAlph()
 void FBAlg::CalBeta()
 {
    // Base case : beta_T(i) = 1
-   for (int l = 0; l < dLINE; l++)
+   for (int l = 0; l < line; l++)
       for (int i = 0; i < state; i++)
          fb.b.at(l)[dTIME - 1][i] = 1.0;
 
@@ -77,7 +78,7 @@ void FBAlg::CalBeta()
    // t = T-1, T-2, ..., 1
    // 1 <= i <= N
    //----------------------------------------------------------------
-   for (int l = 0; l < dLINE; l++)
+   for (int l = 0; l < line; l++)
       for (int t = dTIME - 2; t >= 0; t--)
          for (int i = 0; i < state; i++)
             for (int j = 0; j < state; j++)
@@ -86,11 +87,13 @@ void FBAlg::CalBeta()
 
 void FBAlg::CalGamma()
 {
-   for (int l = 0; l < dLINE; l++)
+   double sum;
+   double *tmp;
+   for (int l = 0; l < line; l++)
       for (int t = 0; t < dTIME; t++)
       {
-         double sum = 0;
-         double *tmp;
+         sum = 0;
+
          tmp = (double *)calloc(state, sizeof(double));
 
          for (int j = 0; j < state; j++)
@@ -101,16 +104,17 @@ void FBAlg::CalGamma()
 
          for (int i = 0; i < state; i++)
             fb.g.at(l)[t][i] = tmp[i] / sum;
+         free(tmp);
       }
 }
 
 void FBAlg::CalXi()
 {
-   for (int l = 0; l < dLINE; l++)
+   double sum, tmp;
+   for (int l = 0; l < line; l++)
       for (int t = 0; t < dTIME - 1; t++)
       {
-         double sum = 0, tmp;
-
+         sum = 0;
          for (int j = 0; j < state; j++)
          {
             for (int i = 0; i < state; i++)
@@ -149,9 +153,9 @@ void FBAlg::UpdateInitial()
    for (int i = 0; i < state; i++)
    {
       sum = 0;
-      for (int l = 0; l < dLINE; l++)
+      for (int l = 0; l < line; l++)
          sum += fb.g.at(l)[0][i];
-      fb.newI.at(i) = sum / dLINE;
+      fb.newI.at(i) = sum / line;
    }
 
    // Check Initial Matrix : Sum of each probability should equal to 1
@@ -174,7 +178,7 @@ void FBAlg::UpdateTransitionA()
          sum_g = 0.0;
          sum_x = 0.0;
 
-         for (int l = 0; l < dLINE; l++)
+         for (int l = 0; l < line; l++)
             for (int t = 0; t < dTIME - 1; t++)
             {
                sum_x += fb.x.at(l)[t][i][j];
@@ -206,7 +210,7 @@ void FBAlg::UpdateObservationB()
       {
          sum = 0.0;
          sum_o = 0.0;
-         for (int l = 0; l < dLINE; l++)
+         for (int l = 0; l < line; l++)
             for (int t = 0; t < dTIME; t++)
             {
                if (k == fb.seq.at(l)[t])
