@@ -14,12 +14,12 @@ test :
 ========================
 DIRECTORY:
 
-bin/	   executable binary
-data/    input data (train sequences and test sequences)
-doc/	   reports
-inc/	   include library (*.h files)
-outputs/ test result
-src/ 	   source C++ codes (*.cpp files)
+bin/	        executable binary
+data/           input data (train sequences and test sequences)
+doc/	        reports
+inc/	        include library (*.h files)
+outputs/        test result
+src/ 	        source C++ codes (*.cpp files)
 model_01~5.txt
 Makefile
 README
@@ -48,13 +48,14 @@ HOW TO RUN:
 	./bin/test ./modellist.txt ./data/test_seq.txt ./outputs/result.txt
 ========================
 OTHER NOTICE:
-     hw1.zip/
-     +- hw1/
-      +- inc/
-      |  +- hmm.h, FB.h, Viterbi.h
-      +- src/
-      |  +- train.cpp, FB.cpp       : train model by forward-backward algorithm.
-      |  +- test.cpp, Viterbi.cpp   : test model by Viterbi algorithm
-      +- model_init.txt             : initial training model
-      +- report.pdf
-      +- Makefile
+  compressed zip folder:
+    +- hw1.zip/
+       +- hw1/
+          +- inc/
+          |  +- hmm.h, FB.h, Viterbi.h
+          +- src/
+          |  +- train.cpp, FB.cpp       : train model by forward-backward algorithm.
+          |  +- test.cpp, Viterbi.cpp   : test model by Viterbi algorithm
+          +- model_init.txt             : initial training model
+          +- report.pdf
+          +- Makefile
