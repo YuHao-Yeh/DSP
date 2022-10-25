@@ -1,6 +1,7 @@
 This is README file for DSP HW#1
 Author: 葉育豪
 Date: 2022/10/25
+
 ========================
 SYNOPSIS:
 
@@ -22,11 +23,13 @@ src/ 	   source C++ codes (*.cpp files)
 model_01~5.txt
 Makefile
 README
+
 ========================
 HOW TO CIMPILE:
 
 To compile the demo, simply follow the following steps
 	make
+
 ========================
 HOW TO RUN:
 
