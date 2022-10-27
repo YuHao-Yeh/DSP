@@ -14,10 +14,6 @@
 #define dLINE 10000
 #endif
 
-#ifndef defTIME
-#define dTIME 50
-#endif
-
 #ifndef defDIGIT
 #define dDIGIT 100000
 #endif
@@ -26,7 +22,6 @@ using namespace std;
 
 typedef struct ForwardBackward
 {
-   vector<vector<int>> seq;
    vector<vector<vector<double>>> a;         // alph[line][time][state]
    vector<vector<vector<double>>> b;         // beta[line][time][state]
    vector<vector<vector<double>>> g;         // gamma[line][time][state]
@@ -36,17 +31,33 @@ typedef struct ForwardBackward
    vector<vector<double>> newT; // new Transition matrix[state][state]
    vector<vector<double>> newO; // new Observation matrix[observation][state]
 
+   ~ForwardBackward()
+   {
+      a.clear();
+      b.clear();
+      g.clear();
+      x.clear();
+      newI.clear();
+      newT.clear();
+      newO.clear();
+   }
 } FB;
 
 class FBAlg
 {
 private:
+   vector<vector<int>> seq;
+   vector<short> seq_size;
    int line;
-   int state;
+   int time;
+   int stnum;
    int obnum; // observation number
    FB fb;
    HMM hmm; // observation[observation][state] : obeservation i comes from state j
             // transition[state i][state j] : state i to state j
+
+   // Re-construct fb after read sequences
+   void ConstructFB();
 
    // Calculate Variables; called by CalVar()
    void CalAlph();
@@ -61,25 +72,11 @@ private:
    void UpdateHMM();
 
 public:
-   FBAlg(HMM hmm_a) : hmm(hmm_a)
-   {
-      line = 0;
-      state = hmm_a.state_num;
-      obnum = hmm_a.observ_num;
-
-      fb.a.assign(dLINE, vector<vector<double>>(dTIME, vector<double>(state, 0.0)));
-      fb.b.assign(dLINE, vector<vector<double>>(dTIME, vector<double>(state, 0.0)));
-      fb.g.assign(dLINE, vector<vector<double>>(dTIME, vector<double>(state, 0.0)));
-      fb.x.assign(dLINE, vector<vector<vector<double>>>(dTIME, vector<vector<double>>(state, vector<double>(state, 0.0))));
-      fb.seq.assign(dLINE, vector<int>(dTIME, 0));
-      fb.newI.assign(state, 0.0);
-      fb.newT.assign(state, vector<double>(state, 0.0));
-      fb.newO.assign(obnum, vector<double>(state, 0.0));
-   }
-   ~FBAlg(){};
+   FBAlg(HMM hmm_a);
+   ~FBAlg();
 
    // Input sequence
-   void GetSeq(string);
+   void ReadSeq(string);
 
    // Calculate Variables
    void CalVar();

@@ -33,21 +33,36 @@ int main(int argc, char *argv[])
    string fseq = argv[2];  // test sequence filepath
    string fout = argv[3];  // output filepath
 
+   tmusg.periodStart();
+
+   ifstream ifs(flist, ios::in);
+   vector<string> modname;
+   short modnum = 0;
+   char tmp[dMAX_LINE + 1];
+   while (ifs.getline((char *)&tmp, dMAX_LINE + 1))
+   {
+      modname.push_back(tmp);
+      modnum++;
+   }
+
+   ifs.close();
+
    //-------------------------------------------------------------------
    // Start Viterbi Algorithm
    //-------------------------------------------------------------------
-   HMM hmm[5];
-   load_models(flist.c_str(), hmm, dMAX_NUM);
-   Viterbi vit(hmm, dMAX_NUM);
-   vit.GetSeq(fseq);
-   vit.Process();
+   Viterbi vit(modnum);
+   vit.RecvSeq(fseq);
+   vit.RecvHMM(modname);
+   vit.StartVit();
 
    //-------------------------------------------------------------------
    // Write File
    //-------------------------------------------------------------------
    vit.WriteViterbi(fout);
 
-   dump_models(hmm, 5);
+   vit.WriteAccuracy();
+
+   // dump_models(hmm, 5);
 
    tmusg.getPeriodUsage(stat);
    cout << "The total CPU time: " << (stat.uTime + stat.sTime) / 1000.0 / 1000.0 << "s" << endl;

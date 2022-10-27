@@ -1,35 +1,35 @@
-#ifndef HMM_HEADER_
-#define HMM_HEADER_
+#ifndef _HMM_HEADER_
+#define _HMM_HEADER_
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#ifndef MAX_STATE
-#define MAX_STATE 10
+#ifndef defMAX_STATE
+#define dMAX_STATE 10
 #endif
 
-#ifndef MAX_OBSERV
-#define MAX_OBSERV 26
+#ifndef defMAX_OBSERV
+#define dMAX_OBSERV 26
 #endif
 
-#ifndef MAX_SEQ
-#define MAX_SEQ 200
+#ifndef defMAX_SEQ
+#define dMAX_SEQ 200
 #endif
 
-#ifndef MAX_LINE
-#define MAX_LINE 256
+#ifndef defMAX_LINE
+#define dMAX_LINE 256
 #endif
 
 typedef struct
 {
     char *model_name;
-    int state_num;                             // number of state
-    int observ_num;                            // number of observation
-    double initial[MAX_STATE];                 // initial prob.
-    double transition[MAX_STATE][MAX_STATE];   // transition prob.
-    double observation[MAX_OBSERV][MAX_STATE]; // observation prob.
+    int state_num;                               // number of state
+    int observ_num;                              // number of observation
+    double initial[dMAX_STATE];                  // initial prob.
+    double transition[dMAX_STATE][dMAX_STATE];   // transition prob.
+    double observation[dMAX_OBSERV][dMAX_STATE]; // observation prob.
 } HMM;
 
 static FILE *open_or_die(const char *filename, const char *ht)
@@ -52,7 +52,7 @@ static void loadHMM(HMM *hmm, const char *filename)
     hmm->model_name = (char *)malloc(sizeof(char) * (strlen(filename) + 1));
     strcpy(hmm->model_name, filename);
 
-    char token[MAX_LINE] = "";
+    char token[dMAX_LINE] = "";
     while (fscanf(fp, "%s", token) > 0)
     {
         if (token[0] == '\0' || token[0] == '\n')
@@ -116,7 +116,7 @@ static int load_models(const char *listname, HMM *hmm, const int max_num)
     FILE *fp = open_or_die(listname, "r");
 
     int count = 0;
-    char filename[MAX_LINE] = "";
+    char filename[dMAX_LINE] = "";
     while (fscanf(fp, "%s", filename) == 1)
     {
         loadHMM(&hmm[count], filename);

@@ -6,7 +6,27 @@
 //----------------------------------------------------------------------
 #include "../inc/Viterbi.h"
 
-void Viterbi::GetSeq(string filepath)
+Viterbi::Viterbi(int modnum_a)
+{
+   modnum = modnum_a;
+   line = 0;
+   time = 0;
+   state_num.assign(modnum, 0);
+   observe_num.assign(modnum, 0);
+   seq.assign(dLINE + 1, vector<int>(dMAX_SEQ, 0));
+   seq_size.assign(dLINE, 0);
+}
+
+Viterbi::~Viterbi()
+{
+   state_num.clear();
+   observe_num.clear();
+   seq.clear();
+   seq_size.clear();
+   max.clear();
+}
+
+void Viterbi::RecvSeq(string filepath)
 {
    ifstream ifs(filepath, ios::in);
    if (!ifs.is_open())
@@ -15,39 +35,61 @@ void Viterbi::GetSeq(string filepath)
       exit(1);
    }
 
-   int i = 0;
-   char tmp[dTIME + 1];
-   while (ifs.getline((char *)&tmp, dTIME + 1))
+   char tmp[dMAX_SEQ + 1];
+   while (ifs.getline((char *)&tmp, dMAX_SEQ + 1))
    {
-      for (int j = 0; j < dTIME; j++)
-         seq.at(i)[j] = int(tmp[j] - 'A');
-      i++;
+      for (int j = 0; j < ifs.gcount(); j++)
+         seq.at(line)[j] = int(tmp[j] - 'A');
+      seq_size.at(line) = ifs.gcount() - 1;
+      line++;
    }
+   time = *max_element(seq_size.begin(), seq_size.end());
+   seq.resize(line, vector<int>(time));
+   seq_size.resize(line);
+
    ifs.close();
 }
 
-void Viterbi::Process()
+void Viterbi::RecvHMM(vector<string> modlist)
+{
+   ifstream ifs;
+   for (int i = 0; i < modnum; i++)
+   {
+      loadHMM(&hmm[i], modlist.at(i).c_str());
+      this->state_num.at(i) = hmm[i].state_num;
+      this->observe_num.at(i) = hmm[i].state_num;
+   }
+   this->state = *max_element(state_num.begin(), state_num.end());
+   this->obnum = hmm[0].state_num;
+}
+
+void Viterbi::StartVit()
 {
    for (int i = 0; i < modnum; i++)
+   {
+      vit[i].d.assign(line, vector<vector<double>>(time, vector<double>(state, 0.0)));
+      vit[i].p.assign(line, vector<vector<short>>(time, vector<short>(state, 0)));
       CalDelta(i);
-
+   }
+   max.assign(line, make_pair(0, 0.0));
    FindMax();
 }
 
 void Viterbi::CalDelta(int mod)
 {
-   for (int l = 0; l < dLINE; l++)
+   for (int l = 0; l < line; l++)
       for (int i = 0; i < state; i++)
       {
          vit[mod].d.at(l)[0][i] = hmm[mod].initial[i] * hmm[mod].transition[seq.at(l)[0]][0];
-         vit[mod].p.at(l)[0][i] = 0;
+         // vit[mod].p.at(l)[0][i] = 0; // It has been assigned 0 at initialization
       }
 
-   for (int l = 0; l < dLINE; l++)
-      for (int t = 1; t < dTIME; t++)
+   for (int l = 0; l < line; l++)
+      for (int t = 1; t < time; t++)
+      {
+         vector<double> tmp(time, 0.0);
          for (int j = 0; j < state; j++)
          {
-            vector<double> tmp(dTIME, 0.0);
             for (int i = 0; i < state; i++)
                tmp.at(i) = vit[mod].d.at(l)[t - 1][i] * hmm[mod].transition[i][j];
 
@@ -57,18 +99,26 @@ void Viterbi::CalDelta(int mod)
             vit[mod].d.at(l)[t][j] = max * hmm[mod].observation[seq.at(l)[t]][j];
             vit[mod].p.at(l)[t][j] = index;
          }
+      }
 }
 
 void Viterbi::FindMax()
 {
    vector<double> tmp(modnum, 0.0);
-   for (int l = 0; l < dLINE; l++)
+   for (int l = 0; l < line; l++)
    {
       for (int i = 0; i < modnum; i++)
-         tmp.at(i) = vit[i].d.at(l)[dTIME - 1][seq.at(l)[dTIME - 1]];
+         tmp.at(i) = vit[i].d.at(l)[time - 1][seq.at(l)[time - 1]];
       max[l].second = *max_element(tmp.begin(), tmp.end());
       max[l].first = max_element(tmp.begin(), tmp.end()) - tmp.begin() + 1;
    }
+}
+
+void Viterbi::WriteViterbi(string filepath)
+{
+   ofstream ofs(filepath, ios::out);
+   for (int l = 0; l < line; l++)
+      ofs << "model_0" << max.at(l).first << ".txt " << max.at(l).second << "\n";
 }
 
 void Viterbi::WriteAccuracy()
@@ -88,7 +138,7 @@ void Viterbi::WriteAccuracy()
       exit(1);
    }
 
-   vector<int> ans(dLINE, 0);
+   vector<int> ans(line, 0);
    char tmp[13];
    int i = 0;
    while (ifs.getline(tmp, 13))
@@ -97,20 +147,13 @@ void Viterbi::WriteAccuracy()
       i++;
    }
    int count = 0;
-   for (int l = 0; l < dLINE; l++)
+   for (int l = 0; l < line; l++)
       if (ans.at(l) == this->max.at(l).first)
          count++;
 
    ofs << count << " cases are corrected.\n";
-   ofs << "Accuracy = " << 1.0 * count / dLINE * 100.0 << "%.\n";
+   ofs << "Accuracy = " << 1.0 * count / line * 100.0 << "%.\n";
 
    ifs.close();
    ofs.close();
-}
-
-void Viterbi::WriteViterbi(string filepath)
-{
-   ofstream ofs(filepath, ios::out);
-   for (int l = 0; l < dLINE; l++)
-      ofs << "model_0" << max.at(l).first << ".txt " << max.at(l).second << "\n";
 }
