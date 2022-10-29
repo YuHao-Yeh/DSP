@@ -62,7 +62,7 @@ RESULT:
 ========================
 OTHER NOTICE:
    1. Sequence Limitation:
-         In this homework, the length of every training and testing sequences are fixed and same, so I record each input sequecse's length and choose the maxmimum(although every length are the same).
+         In this homework, the length of every training and testing sequences are fixed and same, so I record each input sequecse's length and choose the maxmimum (although every lengths are the same).
          Once the length sequences are not all the same, I just need to replace the value of "time" with my recorded length vector for every needed for loop. 
 
    2. Info. of "hmm.h":
