@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
    //-------------------------------------------------------------------
    vit.WriteViterbi(fout);
 
-   vit.WriteAccuracy();
+   // vit.WriteAccuracy();
 
    // dump_models(hmm, 5);
 

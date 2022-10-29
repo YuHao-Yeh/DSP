@@ -151,8 +151,11 @@ void Viterbi::WriteAccuracy()
       if (ans.at(l) == this->max.at(l).first)
          count++;
 
-   ofs << count << " cases are corrected.\n";
+   ofs << count << " cases are correct.\n";
    ofs << "Accuracy = " << 1.0 * count / line * 100.0 << "%.\n";
+
+   cout << count << " cases are correct.\n";
+   cout << "Accuracy = " << 1.0 * count / line * 100.0 << "%.\n";
 
    ifs.close();
    ofs.close();

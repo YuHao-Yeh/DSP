@@ -1,2 +1,2 @@
-2073 cases are corrected.
-Accuracy = 82.92%.
+2355 cases are correct.
+Accuracy = 94.2%.

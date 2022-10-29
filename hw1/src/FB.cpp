@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 // File:       FB.cpp
 // Author:     Yu-Hao Yeh
-// Synopsis:   Realization of Forward-Backward Algorithm
+// Synopsis:   Implementation of Forward-Backward Algorithm
 // Date:       2022/10/25
 //----------------------------------------------------------------------
 #include "../inc/FB.h"
@@ -14,12 +14,10 @@ FBAlg::FBAlg(HMM hmm_a)
    stnum = hmm_a.state_num;
    obnum = hmm_a.observ_num;
    seq.assign(dLINE, vector<int>(dMAX_SEQ, 0));
-   seq_size.assign(dLINE, 0);
 }
 
 FBAlg::~FBAlg()
 {
-   seq.clear();
    seq.clear();
 };
 
@@ -32,6 +30,7 @@ void FBAlg::ReadSeq(string filepath)
       exit(1);
    }
 
+   vector<short> seq_size(dLINE, 0);
    char tmp[dMAX_SEQ + 1];
    while (ifs.getline((char *)&tmp, dMAX_SEQ + 1))
    {
@@ -42,71 +41,51 @@ void FBAlg::ReadSeq(string filepath)
    }
    time = *max_element(seq_size.begin(), seq_size.end());
    seq.resize(line, vector<int>(time));
-   seq_size.resize(line);
 
-   ConstructFB();
-
-   ifs.close();
-}
-
-void FBAlg::ConstructFB()
-{
+   // Construct fb
    fb.a.assign(line, vector<vector<double>>(time, vector<double>(stnum, 0.0)));
    fb.b.assign(line, vector<vector<double>>(time, vector<double>(stnum, 0.0)));
    fb.g.assign(line, vector<vector<double>>(time, vector<double>(stnum, 0.0)));
    fb.x.assign(line, vector<vector<vector<double>>>(time, vector<vector<double>>(stnum, vector<double>(stnum, 0.0))));
-   fb.newI.assign(stnum, 0.0);
-   fb.newT.assign(stnum, vector<double>(stnum, 0.0));
-   fb.newO.assign(obnum, vector<double>(stnum, 0.0));
+
+   ifs.close();
 }
 
-void FBAlg::CalVar()
+void FBAlg::StartForBack()
 {
-   CalAlph();
-   CalAlph();
-   CalBeta();
-   CalGamma();
-   CalXi();
-}
-
-void FBAlg::CalAlph()
-{
-   // Base case : aplh_1(i) = pi_i * beta_i(obsevation_1)
-   for (int l = 0; l < line; l++)
-      for (int j = 0; j < stnum; j++)
-         fb.a.at(l)[0][j] = hmm.initial[j] * hmm.observation[seq.at(l)[0]][j];
-
    //----------------------------------------------------------------
-   // Inductive step:
-   // alph_{t+1}(i) = sigma_{i=1}^N {alph_t(i) * tran_a_ij} * ob_b_j(o_{t+1})
-   // 1 <= t <= T-1
-   // 1 <= j <= N
+   // Base case :
+   // 1. aplh_1(i) = pi_i * beta_i(obsevation_1)
+   // 2. beta_T(i) = 1
    //----------------------------------------------------------------
-   double *tmp;
+   int T = time - 1, tmpt;
+   double sum;
    for (int l = 0; l < line; l++)
-      for (int t = 1; t < time; t++)
+      for (int i = 0; i < stnum; i++)
       {
+         fb.a.at(l)[0][i] = hmm.initial[i] * hmm.observation[seq.at(l)[0]][i];
+         fb.b.at(l)[T][i] = 1.0;
+      }
 
-         tmp = (double *)calloc(stnum, sizeof(double));
-
+   //----------------------------------------------------------------
+   // Parameter : Alph
+   // Inductive step:
+   // alph_{t+1}(i) = sigma_{i=1}^{i=N} {alph_t(i) * tran_a_ij} * ob_b_j(o_{t+1})
+   // t = [1, T-1], j = [1, N]
+   //----------------------------------------------------------------
+   for (int l = 0; l < line; l++)
+      for (int t = 0; t < T; t++)
+      {
+         tmpt = t + 1;
          for (int j = 0; j < stnum; j++)
          {
             for (int i = 0; i < stnum; i++)
-               tmp[j] += fb.a.at(l)[t - 1][i] * hmm.transition[i][j];
-            fb.a.at(l)[t][j] = tmp[j] * hmm.observation[seq.at(l)[t]][j];
+               fb.a.at(l)[tmpt][j] += fb.a.at(l)[t][i] * hmm.transition[i][j];
+            fb.a.at(l)[tmpt][j] *= hmm.observation[seq.at(l)[tmpt]][j];
          }
-         free(tmp);
       }
-}
-
-void FBAlg::CalBeta()
-{
-   // Base case : beta_T(i) = 1
-   for (int l = 0; l < line; l++)
-      for (int i = 0; i < stnum; i++)
-         fb.b.at(l)[time - 1][i] = 1.0;
-
    //----------------------------------------------------------------
+   // Parameter : Beta
    // Inductive step:
    // beta_t(i) = sigma_{j=1}^N tran_a_ij * ob_b_j(o_{t+1}) * beta_{t+1}(j)
    // t = T-1, T-2, ..., 1
@@ -114,164 +93,142 @@ void FBAlg::CalBeta()
    //----------------------------------------------------------------
    for (int l = 0; l < line; l++)
       for (int t = time - 2; t >= 0; t--)
+      {
+         tmpt = t + 1;
          for (int i = 0; i < stnum; i++)
             for (int j = 0; j < stnum; j++)
-               fb.b.at(l)[t][i] += hmm.transition[i][j] * hmm.observation[seq.at(l)[t + 1]][j] * fb.b.at(l)[t + 1][j];
-}
-
-void FBAlg::CalGamma()
-{
-   double sum;
-   double *tmp;
-   for (int l = 0; l < line; l++)
-      for (int t = 0; t < time; t++)
-      {
-         sum = 0;
-         tmp = (double *)calloc(stnum, sizeof(double));
-
-         for (int j = 0; j < stnum; j++)
-         {
-            tmp[j] = fb.a.at(l)[t][j] * fb.b.at(l)[t][j];
-            sum += tmp[j];
-         }
-
-         for (int i = 0; i < stnum; i++)
-            fb.g.at(l)[t][i] = tmp[i] / sum;
-         free(tmp);
+               fb.b.at(l)[t][i] += hmm.transition[i][j] * hmm.observation[seq.at(l)[tmpt]][j] * fb.b.at(l)[tmpt][j];
       }
-}
-
-void FBAlg::CalXi()
-{
-   double sum;
-   vector<vector<double>> tmp(stnum, vector<double>(stnum));
-
+   //----------------------------------------------------------------
+   // Parameter : Xi
+   // Inductive step:
+   // Xi_t(i, j) = P(q_t = i, q_{t+1} = j | O, lambda) = n/d
+   // n = alph_t(i) * tran_a_ij * ob_b_j(0_{t+1}) * beta_{t+1}(j)
+   // d = sigma_{i=1}^{i=N} {alph_t(i) * beta_{t}(i)}}
+   // t = 1, 2, ... T-1
+   //----------------------------------------------------------------
+   // Parameter : Gamma
+   // Inductive step:
+   // Gamma_t(i) = P(q_t = i | O, lambda) = n/d
+   //            = sigma_t{j=1}^{j=N} xi_t(i, j), t=[1, T-1]
+   //              + alph_T(i) * beta_T(j) / sigma_{j=1}^{j=N} alph_T(i) * beta_{t+1}(j)
+   // n = alph_t(i) * beta_t(j)
+   // d = sigma_{j=1}^{j=N} alph_t(i) * beta_{t+1}(j)
+   //----------------------------------------------------------------
    for (int l = 0; l < line; l++)
       for (int t = 0; t < time - 1; t++)
       {
          sum = 0;
-         for (int j = 0; j < stnum; j++)
-         {
-            for (int i = 0; i < stnum; i++)
-            {
-               tmp.at(i)[j] = fb.a.at(l)[t][i];
-               tmp.at(i)[j] *= hmm.transition[i][j];
-               tmp.at(i)[j] *= hmm.observation[seq.at(l)[t + 1]][j];
-               tmp.at(i)[j] *= fb.b.at(l)[t + 1][j];
-               sum += tmp.at(i)[j];
-            }
-         }
+         // sigma_{i=1}^{i=N} alph_t(i) * beta_t(i)
+         for (int i = 0; i < stnum; i++)
+            sum += fb.a.at(l)[t][i] * fb.b.at(l)[t][i];
 
          for (int i = 0; i < stnum; i++)
+         {
+            // Gamma
+            fb.g.at(l)[t][i] = fb.a.at(l)[t][i] * fb.b.at(l)[t][i] / sum;
+            // Xi
             for (int j = 0; j < stnum; j++)
-               fb.x.at(l)[t][i][j] = tmp.at(i)[j] / sum;
+               fb.x.at(l)[t][i][j] = fb.a.at(l)[t][i] * hmm.transition[i][j] * hmm.observation[seq.at(l)[t + 1]][j] * fb.b.at(l)[t + 1][j] / sum;
+         }
       }
-}
-
-void FBAlg::Update()
-{
-   UpdateInitial();
-   UpdateTransitionA();
-   UpdateObservationB();
-   UpdateHMM();
-}
-
-void FBAlg::UpdateInitial()
-{
-   double sum;
-   for (int i = 0; i < stnum; i++)
+   // Gamma_T(i)
+   for (int l = 0; l < line; l++)
    {
       sum = 0;
-      for (int l = 0; l < line; l++)
-         sum += fb.g.at(l)[0][i];
-      fb.newI.at(i) = sum / line;
-   }
-
-   // Check Initial Matrix : Sum of each probability should equal to 1
-   sum = 0.0;
-   for (int i = 0; i < stnum; i++)
-      sum += fb.newI.at(i);
-   if (sum != 1.0)
       for (int i = 0; i < stnum; i++)
-         fb.newI.at(i) /= sum;
-   // fb.newI.at(i) = round(dDIGIT * (fb.newI.at(i) / sum)) / dDIGIT;
-}
-
-void FBAlg::UpdateTransitionA()
-{
-   double sum, sum_g, sum_x;
-
-   for (int i = 0; i < stnum; i++)
-      for (int j = 0; j < stnum; j++)
-      {
-         sum_g = 0.0;
-         sum_x = 0.0;
-
-         for (int l = 0; l < line; l++)
-            for (int t = 0; t < time - 1; t++)
-            {
-               sum_x += fb.x.at(l)[t][i][j];
-               sum_g += fb.g.at(l)[t][i];
-            }
-
-         fb.newT.at(i)[j] = sum_x / sum_g;
-      }
-   // Check Trasition Matrix : Sum of each row should equal to 1
-   for (int i = 0; i < stnum; i++)
-   {
-      sum = 0.0;
-      for (int j = 0; j < stnum; j++)
-         sum += fb.newT.at(i)[j];
-      if (sum != 1.0)
-         for (int j = 0; j < stnum; j++)
-            fb.newT.at(i)[j] /= sum;
-      // fb.newT.at(i)[j] = round(dDIGIT * (fb.newT.at(i)[j] / sum)) / dDIGIT;
-   }
-}
-
-void FBAlg::UpdateObservationB()
-{
-   double sum, sum_o;
-
-   for (int j = 0; j < stnum; j++)
-   {
-      for (int k = 0; k < obnum; k++)
-      {
-         sum = 0.0;
-         sum_o = 0.0;
-         for (int l = 0; l < line; l++)
-            for (int t = 0; t < time; t++)
-            {
-               if (k == seq.at(l)[t])
-                  sum_o += fb.g[l][t][j];
-               sum += fb.g[l][t][j];
-            }
-         fb.newO.at(k)[j] = sum_o / sum;
-      }
-   }
-   // Check Observation Matrix : Sum of each column should equal to 1
-   for (int j = 0; j < obnum; j++)
-   {
-      sum = 0.0;
+         sum += fb.a.at(l)[T][i] * fb.b.at(l)[T][i];
       for (int i = 0; i < stnum; i++)
-         sum += fb.newT.at(i)[j];
-      if (sum != 1.0)
-         for (int i = 0; i < stnum; i++)
-            fb.newO.at(i)[j] /= sum;
-      // fb.newO.at(i)[j] = round(dDIGIT * (fb.newO.at(i)[j] / sum)) / dDIGIT;
+         fb.g.at(l)[T][i] = fb.a.at(l)[T][i] * fb.b.at(l)[T][i] / sum;
    }
 }
 
 void FBAlg::UpdateHMM()
 {
+   int T = time - 1;
+   //----------------------------------------------------------------
+   // Sum of gamma
+   //----------------------------------------------------------------
+   vector<double> sum_g(stnum, 0.0);
+   for (int l = 0; l < line; l++)
+      for (int i = 0; i < stnum; i++)
+         for (int t = 0; t < time; t++)
+            sum_g[i] += fb.g.at(l)[t][i];
+
+   //----------------------------------------------------------------
+   // Probability : Pi
+   // Inductive step:
+   //----------------------------------------------------------------
+   double check_sum = 0;
    for (int i = 0; i < stnum; i++)
-      hmm.initial[i] = fb.newI.at(i);
+   {
+      for (int l = 0; l < line; l++)
+         hmm.initial[i] += fb.g.at(l)[0][i];
+      hmm.initial[i] /= line;
+      check_sum += hmm.initial[i];
+   }
+
+   // Check Initial Matrix : Sum of each probability should equal to 1
+   if (check_sum != 1.0)
+      for (int i = 0; i < stnum; i++)
+         hmm.initial[i] /= check_sum;
+
+   //----------------------------------------------------------------
+   // Probability : Observation
+   //----------------------------------------------------------------
+   double sum;
+
+   for (int i = 0; i < stnum; i++)
+   {
+      for (int k = 0; k < obnum; k++)
+      {
+         sum = 0;
+         for (int l = 0; l < line; l++)
+            for (int t = 0; t < time; t++)
+               if (k == seq.at(l)[t])
+                  sum += fb.g.at(l)[t][k];
+         hmm.observation[k][i] = sum / sum_g[i];
+      }
+   }
+
+   // Check Observation Matrix : Each column's sum = 1
+   for (int j = 0; j < obnum; j++)
+   {
+      check_sum = 0.0;
+      for (int i = 0; i < stnum; i++)
+         check_sum += hmm.observation[i][j];
+      if (check_sum != 1.0)
+         for (int i = 0; i < obnum; i++)
+            hmm.observation[i][j] /= check_sum;
+   }
+
+   //----------------------------------------------------------------
+   // Probability : Transmission
+   //----------------------------------------------------------------
+   vector<double> tmp(stnum, 0);
+   for (int l = 0; l < line; l++)
+      for (int i = 0; i < stnum; i++)
+         tmp[i] = sum_g[i] - fb.g.at(l)[T][i];
    for (int i = 0; i < stnum; i++)
       for (int j = 0; j < stnum; j++)
-         hmm.transition[i][j] = fb.newT.at(i)[j];
-   for (int i = 0; i < obnum; i++)
+      {
+         for (int l = 0; l < line; l++)
+            for (int t = 0; t < T; t++)
+               hmm.transition[i][j] += fb.x.at(l)[t][i][j];
+
+         hmm.transition[i][j] /= tmp[i];
+      }
+
+   // Check Trasition Matrix : Each row's sum = 1
+   for (int i = 0; i < stnum; i++)
+   {
+      check_sum = 0.0;
       for (int j = 0; j < stnum; j++)
-         hmm.observation[i][j] = fb.newO.at(i)[j];
+         check_sum += hmm.transition[i][j];
+      if (check_sum != 1.0)
+         for (int j = 0; j < stnum; j++)
+            hmm.transition[i][j] /= check_sum;
+   }
 }
 
 void FBAlg::PrintHMM()
@@ -301,21 +258,31 @@ void FBAlg::PrintHMM()
    puts("----------------------------");
 }
 
+void FBAlg::PrintP()
+{
+   double sum = 0, T = time - 1;
+   for (int l = 0; l < line; l++)
+      for (int i = 0; i < stnum; i++)
+         sum += fb.a.at(l)[T][i];
+   sum /= line;
+   cout << "P(O | lambda) = " << sum << endl;
+}
+
 void FBAlg::WriteHMM(string filepath)
 {
    puts("----------------------------");
    cout << "Output filepath: " << filepath << endl;
 
    for (int i = 0; i < stnum; i++)
-      fb.newI.at(i) = round(dDIGIT * fb.newI.at(i)) / dDIGIT;
+      hmm.initial[i] = round(dDIGIT * hmm.initial[i]) / dDIGIT;
 
    for (int i = 0; i < stnum; i++)
+   {
       for (int j = 0; j < stnum; j++)
-         fb.newT.at(i)[j] = round(dDIGIT * fb.newT.at(i)[j]) / dDIGIT;
-
-   for (int j = 0; j < obnum; j++)
-      for (int i = 0; i < stnum; i++)
-         fb.newO.at(i)[j] = round(dDIGIT * fb.newO.at(i)[j]) / dDIGIT;
+         hmm.transition[i][j] = round(dDIGIT * hmm.transition[i][j]) / dDIGIT;
+      for (int j = 0; j < obnum; j++)
+         hmm.observation[i][j] = round(dDIGIT * hmm.observation[i][j]) / dDIGIT;
+   }
 
    FILE *fp;
    fp = fopen(filepath.c_str(), "w");

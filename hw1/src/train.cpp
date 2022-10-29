@@ -46,12 +46,17 @@ int main(int argc, char *argv[])
 
    while (iter < iteration)
    {
-      forbackward.CalVar();
-      forbackward.Update();
+      forbackward.StartForBack();
+      forbackward.UpdateHMM();
+      // cout << setw(3) << iter + 1 << " : ";
+      // forbackward.PrintP();
 
       iter++;
       if (!(iter % 20))
+      {
          cout << iter << " iterations are done.\n";
+         // forbackward.PrintHMM();
+      }
    }
 
    forbackward.WriteHMM(fout);

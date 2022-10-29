@@ -1,7 +1,8 @@
 //----------------------------------------------------------------------
 // File:       FB.h
 // Author:     Yu-Hao Yeh
-// Synopsis:   Realization of Forward-Backward Algorithm (Baum-Welch Algorithm)
+// Synopsis:   Implementation of Forward-Backward Algorithm
+//             (Baum-Welch Algorithm)
 // Date:       2022/10/25
 //----------------------------------------------------------------------
 #ifndef _FB_H_
@@ -27,19 +28,12 @@ typedef struct ForwardBackward
    vector<vector<vector<double>>> g;         // gamma[line][time][state]
    vector<vector<vector<vector<double>>>> x; // xi[line][time][state][state]
 
-   vector<double> newI;         // new Initial probability set[state]
-   vector<vector<double>> newT; // new Transition matrix[state][state]
-   vector<vector<double>> newO; // new Observation matrix[observation][state]
-
    ~ForwardBackward()
    {
       a.clear();
       b.clear();
       g.clear();
       x.clear();
-      newI.clear();
-      newT.clear();
-      newO.clear();
    }
 } FB;
 
@@ -47,45 +41,30 @@ class FBAlg
 {
 private:
    vector<vector<int>> seq;
-   vector<short> seq_size;
-   int line;
-   int time;
-   int stnum;
-   int obnum; // observation number
-   FB fb;
-   HMM hmm; // observation[observation][state] : obeservation i comes from state j
-            // transition[state i][state j] : state i to state j
-
-   // Re-construct fb after read sequences
-   void ConstructFB();
-
-   // Calculate Variables; called by CalVar()
-   void CalAlph();
-   void CalBeta();
-   void CalGamma();
-   void CalXi();
-
-   // Update data set; called by Update()
-   void UpdateInitial();
-   void UpdateTransitionA();
-   void UpdateObservationB();
-   void UpdateHMM();
+   int line;  // total lines of training sequences
+   int time;  // longest length of training sequences
+   int stnum; // total state number
+   int obnum; // total observation number
+   FB fb;     // forward-backward parameters
+   HMM hmm;   // observation[observation][state] : obeservation i comes from state j
+              // transition[state i][state j] : state i to state j
 
 public:
-   FBAlg(HMM hmm_a);
+   FBAlg(HMM);
    ~FBAlg();
 
-   // Input sequence
+   // Read training sequences
    void ReadSeq(string);
 
-   // Calculate Variables
-   void CalVar();
+   // Start calculating forward-backward parameters
+   void StartForBack();
 
-   // Update data set
-   void Update();
+   // Update HMM
+   void UpdateHMM();
 
    // Print
-   void PrintHMM();
+   void PrintP();   // Print P(O | lambda) according to Alph_T
+   void PrintHMM(); // Print info of HMM
 
    // Write File
    void WriteHMM(string);

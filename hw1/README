@@ -1,6 +1,10 @@
 This is README file for DSP HW#1
 Author: 葉育豪
-Date: 2022/10/25
+Date: 2022/10/29
+
+========================
+Language:
+   C++
 
 ========================
 SYNOPSIS:
@@ -24,6 +28,8 @@ model_01~5.txt
 Makefile
 README
 
+*"data/test_lbl.txt" records the correct answers to "test_seq.txt" from model 01 ~ 05, which are trained by given "test_seq_01~05.txt" files.
+
 ========================
 HOW TO COMPILE:
 
@@ -46,16 +52,30 @@ HOW TO RUN:
  	./bin/train 100 ./model_init.txt ./data/seq_model_05.txt ./model_05.txt
 	
 	./bin/test ./modellist.txt ./data/test_seq.txt ./outputs/result.txt
+
+========================
+RESULT:
+   The result is recorded in "result.txt" file after I trained my model 01 ~ 05 by "seq_model_01~05.txt", and tested with "test_seq.txt".
+   * Correct Cases: 2355
+   * Accuracy : 94.2%.
+
 ========================
 OTHER NOTICE:
-  compressed zip folder:
-    +- hw1.zip/
-       +- hw1/
-          +- inc/
-          |  +- hmm.h, FB.h, Viterbi.h
-          +- src/
-          |  +- train.cpp, FB.cpp       : train model by forward-backward algorithm.
-          |  +- test.cpp, Viterbi.cpp   : test model by Viterbi algorithm
-          +- model_init.txt             : initial training model
-          +- report.pdf
-          +- Makefile
+   1. Sequence Limitation:
+         In this homework, the length of every training and testing sequences are fixed and same, so I record each input sequecse's length and choose the maxmimum(although every length are the same).
+         Once the length sequences are not all the same, I just need to replace the value of "time" with my recorded length vector for every needed for loop. 
+
+   2. Info. of "hmm.h":
+         This header file, written in C language, is given by TA, it helps me need not to rewrite read/write functions, but I didn't use every funcions.
+
+   3. Compressed ZIP Folder:
+      +- hw1.zip/
+         +- hw1/
+            +- inc/
+            |  +- hmm.h, FB.h, Viterbi.h
+            +- src/
+            |  +- train.cpp, FB.cpp       : train model by forward-backward algorithm.
+            |  +- test.cpp, Viterbi.cpp   : test model by Viterbi algorithm
+            +- model_init.txt             : initial training model
+            +- report.pdf
+            +- Makefile
