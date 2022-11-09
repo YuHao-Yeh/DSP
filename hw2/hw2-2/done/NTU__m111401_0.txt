@@ -1,0 +1,16 @@
+fricative: ㄈㄏㄙㄕㄒ
+affricate: ㄐㄑㄓㄔㄗㄘ
+ polsive:  ㄅㄆㄉㄊㄍㄎ
+
+嘉 ㄐㄧㄚ ji_i ia
+南 ㄋㄢ   n_a an?
+大 ㄉㄚ   d_a a
+圳 ㄗㄨㄣ tz_u uen
+換 ㄏㄨㄢ h_u uan
+上 ㄕㄤ   sh_a ang
+了 ㄌㄜ   l_e e
+新 ㄒㄧㄣ shi_i in
+面 ㄇ一ㄢ m_i ian
+貌 ㄇㄠ   m_a au
+
+      1 en

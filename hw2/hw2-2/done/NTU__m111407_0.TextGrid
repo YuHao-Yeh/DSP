@@ -1,0 +1,118 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 2.883 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "RCDIF" 
+        xmin = 0 
+        xmax = 2.883 
+        intervals: size = 26 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.030922035100726906 
+            text = "d_a" 
+        intervals [2]:
+            xmin = 0.030922035100726906 
+            xmax = 0.11697418421745431 
+            text = "a" 
+        intervals [3]:
+            xmin = 0.11697418421745431 
+            xmax = 0.13552368272510976 
+            text = "sp" 
+        intervals [4]:
+            xmin = 0.13552368272510976 
+            xmax = 0.25063881055481235 
+            text = "k_u" 
+        intervals [5]:
+            xmin = 0.25063881055481235 
+            xmax = 0.4196380753982387 
+            text = "ua" 
+        intervals [6]:
+            xmin = 0.4196380753982387 
+            xmax = 0.45349062710756366 
+            text = "sp" 
+        intervals [7]:
+            xmin = 0.45349062710756366 
+            xmax = 0.5146914961844387 
+            text = "ji_i" 
+        intervals [8]:
+            xmin = 0.5146914961844387 
+            xmax = 0.683746623544071 
+            text = "iau" 
+        intervals [9]:
+            xmin = 0.683746623544071 
+            xmax = 0.7555519585567111 
+            text = "h_u" 
+        intervals [10]:
+            xmin = 0.7555519585567111 
+            xmax = 0.9629591201016143 
+            text = "ua" 
+        intervals [11]:
+            xmin = 0.9629591201016143 
+            xmax = 1.0606378013737328 
+            text = "ji_i" 
+        intervals [12]:
+            xmin = 1.0606378013737328 
+            xmax = 1.1745788645668822 
+            text = "i" 
+        intervals [13]:
+            xmin = 1.1745788645668822 
+            xmax = 1.2915418421922735 
+            text = "j_u" 
+        intervals [14]:
+            xmin = 1.2915418421922735 
+            xmax = 1.4599203412116868 
+            text = "uan" 
+        intervals [15]:
+            xmin = 1.4599203412116868 
+            xmax = 1.6224144078602636 
+            text = "h_e" 
+        intervals [16]:
+            xmin = 1.6224144078602636 
+            xmax = 1.7621829043596264 
+            text = "eng" 
+        intervals [17]:
+            xmin = 1.7621829043596264 
+            xmax = 1.8185904106595363 
+            text = "d_e" 
+        intervals [18]:
+            xmin = 1.8185904106595363 
+            xmax = 1.896414670688289 
+            text = "e" 
+        intervals [19]:
+            xmin = 1.896414670688289 
+            xmax = 1.9440375685134594 
+            text = "sp" 
+        intervals [20]:
+            xmin = 1.9440375685134594 
+            xmax = 2.021795859648377 
+            text = "d_u" 
+        intervals [21]:
+            xmin = 2.021795859648377 
+            xmax = 2.1157379632223403 
+            text = "u" 
+        intervals [22]:
+            xmin = 2.1157379632223403 
+            xmax = 2.2922886897073336 
+            text = "ts_a" 
+        intervals [23]:
+            xmin = 2.2922886897073336 
+            xmax = 2.447493081482044 
+            text = "ai" 
+        intervals [24]:
+            xmin = 2.447493081482044 
+            xmax = 2.5719517764411894 
+            text = "j_e" 
+        intervals [25]:
+            xmin = 2.5719517764411894 
+            xmax = 2.7699951523986734 
+            text = "e" 
+        intervals [26]:
+            xmin = 2.7699951523986734 
+            xmax = 2.883 
+            text = "sil" 

@@ -1,0 +1,95 @@
+Plosive: d_a(ㄉ), k_u(ㄎ)
+Fricative: h_u(ㄏ), shi_i(ㄒ)
+Affricate: ji_i(ㄐ), j_u(ㄓ)
+Nasal: m_i(ㄇ), m_a(ㄇ)
+
+--------------------
+NTU_m111401_0
+--------------------
+嘉 ㄐㄧㄚ ji_i ia
+南 ㄋㄢ   n_a en
+大 ㄉㄚ   d_a a
+圳 ㄗㄨㄣ tz_u uen
+換 ㄏㄨㄢ h_u uan
+上 ㄕㄤ   sh_a ang
+了 ㄌㄜ   l_e e
+新 ㄒㄧㄣ shi_i in
+面 ㄇ一ㄢ m_i ian
+貌 ㄇㄠ   m_a au
+--------------------
+NTU_m111402_0
+--------------------
+滂 ㄆㄤ   p_a ang
+沱 ㄊㄨㄛ t_u uo
+的 ㄉㄜ   d_e e
+水 ㄕㄨㄟ sh_u uei
+流 ㄌㄧㄡ l_i iou
+湍 ㄊㄨㄢ t_u uan
+急 ㄐㄧ   ji_i i
+而 ㄦ     sic_e er
+下 ㄒㄧㄚ shi_i ia
+--------------------
+NTU_m111403_0
+--------------------
+隨 ㄙㄨㄟ s_u uei
+手 ㄕㄡ   sh_o ou
+拎 ㄌㄧㄥ l_i ing
+一 ㄧ     sic_i i
+件 ㄐㄧㄢ ji_i ian
+夾 ㄐㄧㄚ ji_i ia
+克 ㄎㄜ   k_e e
+--------------------
+NTU_m111404_0
+--------------------
+垃 ㄌㄜ   l_e e
+圾 ㄙㄜ   s_e e
+中 ㄓㄨㄥ j_u ueng
+摻 ㄔㄢ   ch_a *en
+雜 ㄗㄚ   tz_a a
+ㄧ ㄧ     sic_i i 
+些 ㄒㄧㄝ shi_i ie
+空 ㄎㄨㄥ k_u ueng
+罐 ㄍㄨㄢ g_u uan
+--------------------
+NTU_m111405_0
+--------------------
+即 ㄐㄧ   ji_i i
+使 ㄕ     sh_empt empt1
+手 ㄕㄡ   sh_o ou
+捧 ㄆㄥ   p_e eng
+金 ㄐㄧㄣ ji_i in
+飯 ㄈㄢ   f_a *en
+碗 ㄨㄢ   sic_u uan
+--------------------
+NTU_m111407_0
+--------------------
+打 ㄉㄚ   d_a a
+垮 ㄎㄨㄚ k_u ua
+狡 ㄐㄧㄠ ji_i iau
+猾 ㄏㄨㄚ h_u ua
+及 ㄐㄧ     ji_i i
+專 ㄓㄨㄢ j_u uan
+橫 ㄏㄥ     h_e eng
+的 ㄉㄜ     d_e e
+獨 ㄉㄨ     d_u u
+裁 ㄘㄞ     ts_a ai
+者 ㄓㄜ     j_e e
+--------------------
+NTU_m111411_0
+--------------------
+朱 ㄓㄨ   j_u u
+小 ㄒㄧㄠ shi_i iau
+姐 ㄐㄧㄝ ji_i ie
+靦 ㄇㄧㄢ m_i ian
+腆 ㄊㄧㄢ t_i ian
+說 ㄕㄨㄛ sh_u uo
+到 ㄉㄠ   d_a au
+--------------------
+NTU_m111427_0
+--------------------
+忙 ㄇㄤ   m_a ang
+得 ㄉㄜ   d_e e
+暈 ㄩㄣ   sic_iu iun
+頭 ㄊㄡ   t_o ou
+轉 ㄓㄨㄢ j_u uan
+向 ㄒㄧㄤ shi_i iang
