@@ -31,7 +31,7 @@ To build the environment, you can just follow the following steps.
 
 1. Install Docker on your system. 
 2. Pull the image and run a container with,    
-    ```docker run -it kaldiasr/kaldi:2020-09 bash```
+    docker run -it kaldiasr/kaldi:2020-09 bash
 
 ========================
 
@@ -43,8 +43,9 @@ Parameters:
     numgauss            # Initial num-Gauss (must be more than #states=3*phones).    
     totgauss            # Target #Gaussians.    
     incgauss            # per-iter increment for #Gauss    
-    realign_iters    
-    scale_opts = "--transition-scale=1.0 --acoustic-scale=0.1 --self-loop-scale=0.5"    
+    realign_iters       # segmental k-means
+    scale_opts = "--transition-scale=1.0 --acoustic-scale=0.1 --self-loop-scale=0.5"
+                        # parameters for gmm-align-compiled, which controls the proportion of probabilities when doing re-alignment.
 
 4-test.sh:    
     opt_acwt    
@@ -103,5 +104,14 @@ OTHER NOTICE:
             +- material    
             |  +- lexicon.txt, lm.arpa.txt, phoneset.txt, test.text, test.wav.scp, topo.proto, train.text, train.wav.scp    
             +- report.pdf
-   2. accuracy = 0% after executing 4-test.sh
-        Check whether viterbi/mono/test.mlf exists, and check out log file under viterbi/mono/log/, if it shows        ```utility/vulcan-am-kaldi-to-htk: No such file or directory```, it implies that the command ```apt install libc6-dev-i386``` is not successfully executed. Please re-execute the command again then retry ```bash 4-test.sh```.
+
+   2. When running source 0-activate.sh, it turns out the error: "/bin/sh: 6: source: not found"
+        Since source is the command of bash, this implies that bash is not assigned when running docker run/exec, so you should add bash before the command.
+            bash source 0-activate.sh
+            
+   3. What if accuracy = 0% after executing 4-test.sh
+        Check whether viterbi/mono/test.mlf exists, and check out log file under viterbi/mono/log/, if it shows 
+            utility/vulcan-am-kaldi-to-htk: No such file or directory
+        , it implies that the command
+            apt install libc6-dev-i386
+        is not successfully executed. Please re-execute the command again then retry bash 4-test.sh.
