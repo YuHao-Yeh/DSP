@@ -1,7 +1,5 @@
 # Mandarin-Digit-Asr
 
-DSP hw2-1
-
 This is README file for DSP HW#2-1
 
 Author: 葉育豪
@@ -34,7 +32,6 @@ To build the environment, you can just follow the following steps.
     docker run -it kaldiasr/kaldi:2020-09 bash
 
 ========================
-
 Parameters:
 
 3-train.sh:     
@@ -108,7 +105,7 @@ OTHER NOTICE:
    2. When running source 0-activate.sh, it turns out the error: "/bin/sh: 6: source: not found"
         Since source is the command of bash, this implies that bash is not assigned when running docker run/exec, so you should add bash before the command.
             bash source 0-activate.sh
-            
+
    3. What if accuracy = 0% after executing 4-test.sh
         Check whether viterbi/mono/test.mlf exists, and check out log file under viterbi/mono/log/, if it shows 
             utility/vulcan-am-kaldi-to-htk: No such file or directory
