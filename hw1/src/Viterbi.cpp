@@ -87,9 +87,9 @@ void Viterbi::CalDelta(int mod)
    for (int l = 0; l < line; l++)
       for (int t = 1; t < time; t++)
       {
-         vector<double> tmp(time, 0.0);
          for (int j = 0; j < state; j++)
          {
+            vector<double> tmp(state, 0.0);
             for (int i = 0; i < state; i++)
                tmp.at(i) = vit[mod].d.at(l)[t - 1][i] * hmm[mod].transition[i][j];
 
