@@ -3,18 +3,18 @@
 This is README file for DSP HW#3
 
 Author: 葉育豪
-Date: 2022/12/7
+Date: 2022/12/07
 
 ========================
 Language:
+
    C++ Shell
 
 ========================
 SYNOPSIS:
 
-After finsihing setting docker environment:    
-    
    source setup.sh
+   make
    ./mydisambig <segmented_file_path> <ZhuYin-Big5_mapping_path> <language_model_path> <output_file_path>
    
 ========================
@@ -22,93 +22,121 @@ Environment:
 
 Ubuntu 18.04, GCC version 7.4.0, srilm 1.5.10
 
-ps. This project uses "SRILM Toolkit", it is a toolkit for building and applying various statistical language models.
+There is a pre-built Docker images with the container: `docker run -it -v ntudsp2020autumn/srilm`
+ps. "SRILM Toolkit" is a toolkit for building and applying various statistical language models.
 
-There is a pre-built Docker images.
-
-To build the environment, you can just follow the following steps.
-
-1. Install Docker on your system. 
-2. Pull the image and run a container with,
-   docker run -it ntudsp2020autumn/srilm
-========================
-Parameters:
-
-3-train.sh:     
-    numiters            # Number of iterations of training    
-    maxiterinc          # Last iter to increase #Gauss on.    
-    numgauss            # Initial num-Gauss (must be more than #states=3*phones).    
-    totgauss            # Target #Gaussians.    
-    incgauss            # per-iter increment for #Gauss    
-    realign_iters       # segmental k-means
-    scale_opts = "--transition-scale=1.0 --acoustic-scale=0.1 --self-loop-scale=0.5"
-                        # parameters for gmm-align-compiled, which controls the proportion of probabilities when doing re-alignment.
-
-4-test.sh:    
-    opt_acwt    
-    test_beam
-
-material/topo.proto:    
-    numbers of NONSILENCEPHONES    
-    numbers of SILENCEPHONES
+Or you can just build the environment on your own.
+   i686:
+      1. Unzip srilm-1.5.10.tar.gz
+      2. Add a variable SRILM, with the value of your srilm file's absolute path, in Makefile.
+         ex. SRILM = /home/speech/stolcke/project/srilm/devel => SRILM = /root/srilm-1.5.10
+      3. modify common/Makefile.machine.i686
+         * line 17: Replace CC with `CC = /usr/bin/gcc $(GCC_FLAGS)`
+         * line 18: Replace CXX with `CXX = /usr/bin/g++ $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES`
+         * line 52, 53: Replace TCL with `TCL = [
+                                          NO_TCL = X
+                                          TCL_INCLUDE =
+                                          TCL_LIBRARY =
+                                       ]`
+      4. Make sure the program under the file sbin/ is executable, or you acn move to the file sbin/, and enter `chmod 755 *` in the command line.
+      5. Enter `make MACHINE_TYPE=i686 World` in the command line.
+      6. Delete temporary files `make cleanest`
+      7. After finishing the install, you can find the executable file under bin/i686.
+   
+   i686-m64:
+      8. For 64 bit machine, follow the step 1.-2. mentioned in i686.
+      9. Follow step 3 for i686, but modify the file `common/Makefile.machine.i686-m64` instead.
+      10. Enter `make MACHINE_TYPE=i686-m64 World` in the command line.
+      11. After finishing the install, you can find the executable file under bni/i686-m64.
+   
+   Mac OS X:
+      12. Unzip srilm-1.5.10.tar.gz
+      13. Modify Makefile, change the SRILM to your own srilm path.
+      14. Open common/Makefile.machine.macosx, and modify it.
+          * line 13: Replace CC with `CC = /usr/bin/gcc $(GCC_FLAGS) -Wimplicit-int`
+          * line 14: Replace CXX with `CXX = /usr/bin/g++ $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES`
+          * line 49, 50: Comment out these two lines.
+      15. Make sure sbin is executable.
+      16. Under the srilm file, enter `make MACHINE_TYPE=macosx World`
+      17. Clean temporary files： `make cleanest`
+      18. After finishing the install, you can see the executable file under /bin/macosx.
+      19. When makeing your Makefile:
+            MACHINE_TYPE = macosx
+            CXX = /usr/bin/g++
 
 ========================
 DIRECTORY:
 
-0-activate.sh
-1-preprocess.sh
-2-extract-feat.sh
-3-train.sh
-4-test.sh
-doc/	                reports
-material/               config and label files 
+setup.sh                setup srilm environment
+doc/                    reports
+src/                    source files, *cpp
+inc/                    include files, *h
+test_data/
+result_bi/              results of bigram viterbi algorithm
+result_tri/             results of trigram viterbi algorithm
+bigram.lm               bigram language model
+trigram.lm              trigram language model
+corpus.txt              corpus
+seperator_big5.pl       
+Big5-ZhuYin.map
+ZhuYin-Big5.map
+Makefile
 README
+
+========================
+HOW TO COMPILE:
+
+To compile the demo, simply follow the following steps
+   source setup.sh
+	make
+
+========================
+MAPPING:
+ 
+   To generate the mapping from ZhuYin to Big5
+      make map
+   , then it will mapping the Big5-ZhuYin.map to ZhuYin-Big5.map.
+   Or you have your own Big5-ZhuYin and ZhuYin-Big5 mapping filepath, you can try
+      ./map <Big5-ZhuYin_mapping_path> <ZhuYin-Big5_mapping_path>
+
+========================
+Language Model
+
+   To generate bigram and trigram language model,
+      make lm
+   , then you can find two language models bigram.lm and trigram.lm.
+   Or if you want to have different order for language model,
+      perl separator_big5.pl <input_text_file> > <output_segmented_file>
+      ngram-count-text <segmented_file> -write <output_count_file> -order <order_of_n-gram>
+      ngram-count-read <count_file> -lm <output_language_model_file> -order <order_of_n-gram> -unk
+   ps. -unk: view OOVs as <unk> instead of removing them
 
 ========================
 HOW TO RUN:
 
-    source 0-activate.sh
-    bash 1-preprocessing
-    bash 2-extract-feat.sh
-    bash 3-train.sh
-    bash 4-test.sh
+   ./mydisambig <segmented_file_path> <ZhuYin-Big5_mapping_path> <language_model_path> <output_file_path>
 
+   ./mydisambig_trigram <segmented_file_path> <ZhuYin-Big5_mapping_path> <language_model_path> <output_file_path>
 
 ========================
 RESULT:
-
-    Converting acoustic models to HTK format
-        output -> viterbi/mono/final.mmf viterbi/mono/tiedlist
-        log -> viterbi/mono/log/am.to.htk.log
-    Generating results for test set with acoustic weight = [ 0.145 ]
-        output -> viterbi/mono/test.mlf
-        log -> viterbi/mono/log/latgen.test.log
-        result -> viterbi/mono/test.rec
-        accuracy -> [ 97.24 ] %
-    
-    Execution time for whole script = 00 hours 00 mins 36 secs
+   The results are recorded under the folders result_bi and result_tri.
 
 ========================
 OTHER NOTICE:
+
    1. Compressed ZIP Folder:
-      +- hw2_1.zip/    
-         +- hw2_1/    
-            +- 0-activate.sh    
-            +- 1-preprocess.sh    
-            +- 2-extract-feat.sh    
-            +- 3-train.sh    
-            +- 4-test.sh    
-            +- material    
-            |  +- lexicon.txt, lm.arpa.txt, phoneset.txt, test.text, test.wav.scp, topo.proto, train.text, train.wav.scp    
+      +- hw3.zip/    
+         +- hw3
+            +- Makefile   
             +- report.pdf
+            +- inc/
+            |  mydisambig_log.h, tm_usage.h
+            +- src/
+            |  mapping.cpp, mydisambig.cpp, mydisambig_trigram.cpp, mydisambig_log.cpp
 
-   2. When running source 0-activate.sh, it turns out the error: "/bin/sh: 6: source: not found"
-        Since source is the command of bash, this implies that bash is not assigned when running docker run/exec, so you should add bash before the command.
-            bash source 0-activate.sh
-
-   3. What if accuracy = 0% after executing 4-test.sh
-        Check whether viterbi/mono/test.mlf exists, and check out log file under viterbi/mono/log/, if it shows 
-            utility/vulcan-am-kaldi-to-htk: No such file or directory
-        , it implies that the command
-            apt install libc6-dev-i386
-        is not successfully executed. Please re-execute the command again then retry bash 4-test.sh.
+   2. When running source setupe.sh, it turns out the error: "/bin/sh: 6: source: not found"
+         Since source is the command of bash, this implies that bash is not assigned when running docker run/exec, so you should add bash before the command.
+            bash source setup.sh
+   3. Why are there gibberishes when opening corpus.txt, Big5-ZhuYin.map, ZhuYin-Big5.map or other test data files?
+         Since these file are encoded in Big5, if you want to open the file, use `iconv -f big5 $filename`.

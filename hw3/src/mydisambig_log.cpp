@@ -2,7 +2,13 @@
 
 Log::Log(string log_file, int ngram_order = 2)
 {
-   this->flog = log_file;
+   if (log_file != "")
+      this->flog = log_file;
+   this->order = ngram_order;
+}
+
+Log::Log(int ngram_order = 2)
+{
    this->order = ngram_order;
 }
 

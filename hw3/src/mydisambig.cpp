@@ -8,18 +8,16 @@
 //----------------------------------------------------------------------
 // #ifdef _MYDISAMBIG_
 
-// #include "bits/stdc++.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <map>
-#include <set>
+#include "bits/stdc++.h"
+// #include <iostream>
+// #include <fstream>
+// #include <string>
+// #include <algorithm>
+// #include <vector>
+// #include <map>
+// #include <set>
+// #include <File.h>
 #include "Ngram.h"
-#include <File.h>
-#include <chrono>
-#include <ctime>
 #include "../inc/tm_usage.h"
 #include "../inc/mydisambig_log.h"
 
@@ -30,7 +28,7 @@ const int Ngram_Order = 2;
 Vocab voc;
 Ngram lm(voc, Ngram_Order);
 map<string, set<string>> mapping; // record the mapping in ZhuYin-Big5
-string flog = "mydisambig_log.txt";
+// string flog = "mydisambig_log.txt";
 
 void Help_message(string s = "")
 {
@@ -195,7 +193,7 @@ int main(int argc, char *argv[])
    cout << "memory: " << stat.vmPeak / 1024.0 << "MB" << endl; // print peak memory
 
    // logging
-   Log log(flog, Ngram_Order);
+   Log log(Ngram_Order);
    log.WriteTMusage(fin, (stat.uTime + stat.sTime) / 1000.0 / 1000.0, stat.vmPeak / 1024.0);
 
    return 0;

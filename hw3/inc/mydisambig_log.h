@@ -10,7 +10,7 @@ using namespace std;
 class Log
 {
 private:
-   string flog = "log.txt";
+   string flog = "mydisambig_log.txt";
    int order = 2;
    ofstream ofs;
    time_t rawtime;
@@ -19,6 +19,7 @@ private:
 
 public:
    Log(string, int);
+   Log(int);
    Log();
    ~Log();
 

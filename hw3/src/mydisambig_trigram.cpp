@@ -8,20 +8,16 @@
 //----------------------------------------------------------------------
 // #ifdef _MYDISAMBIG_TRIGRAM_
 
-// #include "bits/stdc++.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <map>
-#include <set>
+#include "bits/stdc++.h"
+// #include <iostream>
+// #include <fstream>
+// #include <string>
+// #include <algorithm>
+// #include <vector>
+// #include <map>
+// #include <set>
+// #include <File.h>
 #include "Ngram.h"
-#include <File.h>
-#include <sys/stat.h>
-#include <cerrno>
-#include <chrono>
-#include <ctime>
 #include "../inc/tm_usage.h"
 #include "../inc/mydisambig_log.h"
 
@@ -32,7 +28,6 @@ const int Ngram_Order = 3;
 Vocab voc;
 Ngram lm(voc, Ngram_Order);
 map<string, set<string>> mapping; // record the mapping in ZhuYin-Big5
-string flog = "mydisambig_log.txt";
 
 void Help_message(string e = "")
 {
@@ -40,21 +35,6 @@ void Help_message(string e = "")
       cerr << "Failed to open " << e << " .\n";
    puts("Usage: ./mydisambig <segmented_file_path> <ZhuYin-Big5_mapping_path> <language_model_path> <output_file_path>.");
    exit(1);
-}
-
-// Get P(W2 | W1) -- bigram
-double getBigramProb(const char *w1, const char *w2)
-{
-   VocabIndex wid1 = voc.getIndex(w1); // ���զr���S���b�r��̭�
-   VocabIndex wid2 = voc.getIndex(w2);
-
-   if (wid1 == Vocab_None) // OOV
-      wid1 = voc.getIndex(Vocab_Unknown);
-   if (wid2 == Vocab_None) // OOV
-      wid2 = voc.getIndex(Vocab_Unknown);
-
-   VocabIndex context[] = {wid1, Vocab_None};
-   return lm.wordProb(wid2, context);
 }
 
 // Get P(W3 | W1, W2) -- trigram
@@ -189,7 +169,7 @@ int main(int argc, char *argv[])
 
       // Initialization for t = 0, t = 1
       for (auto it : str.at(0))
-         prob.at(0).push_back(getBigramProb(Vocab_SentStart, it.c_str()));
+         prob.at(0).push_back(getTrigramProb(Vocab_SentStart, Vocab_SentStart, it.c_str()));
       path.at(0).assign(str.at(0).size(), 0);
 
       prob.at(1).assign(str.at(1).size(), 0.0);
@@ -199,13 +179,13 @@ int main(int argc, char *argv[])
          // Case 1: If the first word is not a ZhuYin
          if (str.at(0).size() == 1)
          {
-            prob.at(1)[curr] = prob.at(0)[0] + getBigramProb(str.at(0)[0].c_str(), str.at(1)[curr].c_str());
+            prob.at(1)[curr] = prob.at(0)[0] + getTrigramProb(Vocab_SentStart, str.at(0)[0].c_str(), str.at(1)[curr].c_str());
             continue;
          }
          // Case 2: If the first word is a ZhuYin
          vector<double> tmp(str.at(0).size(), 0.0);
          for (int prev = 0; prev < str.at(0).size(); prev++)
-            tmp.at(prev) = prob.at(0)[prev] + getBigramProb(str.at(0)[prev].c_str(), str.at(1)[curr].c_str());
+            tmp.at(prev) = prob.at(0)[prev] + getTrigramProb(Vocab_SentStart, str.at(0)[prev].c_str(), str.at(1)[curr].c_str());
 
          double max = *max_element(tmp.begin(), tmp.end());
          int index = max_element(tmp.begin(), tmp.end()) - tmp.begin();
@@ -281,7 +261,7 @@ int main(int argc, char *argv[])
    cout << "memory: " << stat.vmPeak / 1024.0 << "MB" << endl; // print peak memory
 
    // logging
-   Log log(flog, Ngram_Order);
+   Log log(Ngram_Order);
    log.WriteTMusage(fin, (stat.uTime + stat.sTime) / 1000.0 / 1000.0, stat.vmPeak / 1024.0);
 
    return 0;
