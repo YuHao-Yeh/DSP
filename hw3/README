@@ -1,0 +1,114 @@
+# SRILM
+
+This is README file for DSP HW#3
+
+Author: 葉育豪
+Date: 2022/12/7
+
+========================
+Language:
+   C++ Shell
+
+========================
+SYNOPSIS:
+
+After finsihing setting docker environment:    
+    
+   source setup.sh
+   ./mydisambig <segmented_file_path> <ZhuYin-Big5_mapping_path> <language_model_path> <output_file_path>
+   
+========================
+Environment:
+
+Ubuntu 18.04, GCC version 7.4.0, srilm 1.5.10
+
+ps. This project uses "SRILM Toolkit", it is a toolkit for building and applying various statistical language models.
+
+There is a pre-built Docker images.
+
+To build the environment, you can just follow the following steps.
+
+1. Install Docker on your system. 
+2. Pull the image and run a container with,
+   docker run -it ntudsp2020autumn/srilm
+========================
+Parameters:
+
+3-train.sh:     
+    numiters            # Number of iterations of training    
+    maxiterinc          # Last iter to increase #Gauss on.    
+    numgauss            # Initial num-Gauss (must be more than #states=3*phones).    
+    totgauss            # Target #Gaussians.    
+    incgauss            # per-iter increment for #Gauss    
+    realign_iters       # segmental k-means
+    scale_opts = "--transition-scale=1.0 --acoustic-scale=0.1 --self-loop-scale=0.5"
+                        # parameters for gmm-align-compiled, which controls the proportion of probabilities when doing re-alignment.
+
+4-test.sh:    
+    opt_acwt    
+    test_beam
+
+material/topo.proto:    
+    numbers of NONSILENCEPHONES    
+    numbers of SILENCEPHONES
+
+========================
+DIRECTORY:
+
+0-activate.sh
+1-preprocess.sh
+2-extract-feat.sh
+3-train.sh
+4-test.sh
+doc/	                reports
+material/               config and label files 
+README
+
+========================
+HOW TO RUN:
+
+    source 0-activate.sh
+    bash 1-preprocessing
+    bash 2-extract-feat.sh
+    bash 3-train.sh
+    bash 4-test.sh
+
+
+========================
+RESULT:
+
+    Converting acoustic models to HTK format
+        output -> viterbi/mono/final.mmf viterbi/mono/tiedlist
+        log -> viterbi/mono/log/am.to.htk.log
+    Generating results for test set with acoustic weight = [ 0.145 ]
+        output -> viterbi/mono/test.mlf
+        log -> viterbi/mono/log/latgen.test.log
+        result -> viterbi/mono/test.rec
+        accuracy -> [ 97.24 ] %
+    
+    Execution time for whole script = 00 hours 00 mins 36 secs
+
+========================
+OTHER NOTICE:
+   1. Compressed ZIP Folder:
+      +- hw2_1.zip/    
+         +- hw2_1/    
+            +- 0-activate.sh    
+            +- 1-preprocess.sh    
+            +- 2-extract-feat.sh    
+            +- 3-train.sh    
+            +- 4-test.sh    
+            +- material    
+            |  +- lexicon.txt, lm.arpa.txt, phoneset.txt, test.text, test.wav.scp, topo.proto, train.text, train.wav.scp    
+            +- report.pdf
+
+   2. When running source 0-activate.sh, it turns out the error: "/bin/sh: 6: source: not found"
+        Since source is the command of bash, this implies that bash is not assigned when running docker run/exec, so you should add bash before the command.
+            bash source 0-activate.sh
+
+   3. What if accuracy = 0% after executing 4-test.sh
+        Check whether viterbi/mono/test.mlf exists, and check out log file under viterbi/mono/log/, if it shows 
+            utility/vulcan-am-kaldi-to-htk: No such file or directory
+        , it implies that the command
+            apt install libc6-dev-i386
+        is not successfully executed. Please re-execute the command again then retry bash 4-test.sh.
