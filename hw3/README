@@ -15,12 +15,14 @@ SYNOPSIS:
 
    source setup.sh
    make
+   make map
+   make lm
    ./mydisambig <segmented_file_path> <ZhuYin-Big5_mapping_path> <language_model_path> <output_file_path>
    
 ========================
 Environment:
 
-Ubuntu 18.04, GCC version 7.4.0, srilm 1.5.10
+   Ubuntu 18.04, GCC version 7.4.0, srilm 1.5.10
 
 There is a pre-built Docker images with the container: `docker run -it -v ntudsp2020autumn/srilm`
 ps. "SRILM Toolkit" is a toolkit for building and applying various statistical language models.
@@ -120,7 +122,21 @@ HOW TO RUN:
 
 ========================
 RESULT:
+   
    The results are recorded under the folders result_bi and result_tri.
+
+========================
+OBSERVATION:
+
+   1. After testing test data 1.txt-10.txt:
+         Average CPU time:
+            bigram for 1-10.txt: 3.01133s
+            trigram for 1-5.txt: 10.5045s
+            trigram for 6-10.txt: 524.962s
+         Average peak memory usage:
+            bigram for 1-10.txt: 39.2024MB
+            trigram for 1-10.txt: 83.5019MB
+   2. Trigram viterbi model outperforms bigram viterbi model in accuracy.
 
 ========================
 OTHER NOTICE:
@@ -133,7 +149,10 @@ OTHER NOTICE:
             +- inc/
             |  mydisambig_log.h, tm_usage.h
             +- src/
-            |  mapping.cpp, mydisambig.cpp, mydisambig_trigram.cpp, mydisambig_log.cpp
+            |  mapping.cpp             : mapping from Big5-ZhuYin to ZhuYin-Big5
+            |  mydisambig.cpp          : bigram HMM with Viterbi algorithm
+            |  mydisambig_trigram.cpp  : trigram HMM with Viterbi algorithm
+            |  mydisambig_log.cpp      : Log the CPU time and peak memory usage
 
    2. When running source setupe.sh, it turns out the error: "/bin/sh: 6: source: not found"
          Since source is the command of bash, this implies that bash is not assigned when running docker run/exec, so you should add bash before the command.
