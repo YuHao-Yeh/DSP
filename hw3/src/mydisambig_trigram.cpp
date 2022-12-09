@@ -103,8 +103,7 @@ int main(int argc, char *argv[])
    //-------------------------------------------------------------------
    // Get mapping
    //-------------------------------------------------------------------
-   ifstream ifs;
-   ifs.open(fmap, ios::in | ios::binary);
+   ifstream ifs(fmap, ios::in | ios::binary);
    if (!ifs.is_open())
       Help_message("ZhuYin-Big5 mapping file");
 
@@ -140,8 +139,7 @@ int main(int argc, char *argv[])
    //-------------------------------------------------------------------
    // Viterbi algorithm : max P(q_i|q_j,q_k) * δ_{t−1}(q_j, q_k)
    //-------------------------------------------------------------------
-   ofstream ofs;
-   ofs.open(fout, ios::out | ios::binary);
+   ofstream ofs(fout, ios::out | ios::binary);
    if (!ofs.is_open())
       Help_message("output file");
 

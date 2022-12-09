@@ -71,9 +71,9 @@ DIRECTORY:
 
 setup.sh                setup srilm environment
 doc/                    reports
-src/                    source files, *cpp
-inc/                    include files, *h
-test_data/
+src/                    source codes (*.cpp files)
+inc/                    include libraries (*.h files)
+test_data/              input data
 result_bi/              results of bigram viterbi algorithm
 result_tri/             results of trigram viterbi algorithm
 bigram.lm               bigram language model
