@@ -18,12 +18,12 @@ test :
 ========================
 DIRECTORY:
 
-bin/	        executable binary
-data/           input data (train sequences and test sequences)
-doc/	        reports
-inc/	        include library (*.h files)
-outputs/        test result
-src/ 	        source C++ codes (*.cpp files)
+bin/              executable binary
+data/             input data (train sequences and test sequences)
+doc/              reports
+inc/              include library (*.h files)
+outputs/          test result
+src/              C++ source codes (*.cpp files)
 model_01~5.txt
 Makefile
 README
